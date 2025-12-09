@@ -1,90 +1,153 @@
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-
-// 1. 페이지 로드 시 인기 영화 불러오기
+// ▼ [추가] 포스터 없을 때 보여줄 대체 이미지 (검은 배경 + No Poster 텍스트)
+const NO_POSTER_URL = "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
+// 1. 페이지 로드 시 실행
 window.onload = function() {
+    checkLoginStatus(); // 로그인 상태 확인
+    
+    // 인기 영화 불러오기 (공통)
     fetch('/test/popular')
         .then(response => response.json())
         .then(data => renderMovies(data, 'movieContainer'));
 };
 
-// 2. 영화 검색 기능
-function searchMovies() {
-    const query = document.getElementById('searchInput').value;
-    if (!query) {
-        alert("검색어를 입력하세요!");
+// 2. 로그인 상태 체크 및 화면 전환
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn"); // 브라우저 저장소 확인
+
+    if (isLoggedIn === "true") {
+        // 로그인 상태 UI
+        document.getElementById("guestNav").style.display = "none";
+        document.getElementById("userNav").style.display = "block";
+        document.getElementById("personalSection").style.display = "block";
+        document.getElementById("userName").innerText = "김개발"; // 가짜 이름
+
+        // 개인 추천 영화 로드 (일단 인기 영화 API 재활용하거나 다른 API 호출)
+        fetch('/test/popular') 
+            .then(res => res.json())
+            .then(data => renderMovies(data.slice(5, 10), 'personalContainer')); // 5개만 슬쩍 보여주기
+    } else {
+        // 비로그인 상태 UI
+        document.getElementById("guestNav").style.display = "block";
+        document.getElementById("userNav").style.display = "none";
+        document.getElementById("personalSection").style.display = "none";
+    }
+}
+
+// 3. [시뮬레이션] 가짜 로그인
+function fakeLogin() {
+    localStorage.setItem("isLoggedIn", "true");
+    alert("로그인 되었습니다! (테스트용)");
+    location.reload(); // 새로고침해서 UI 반영
+}
+
+// 4. [시뮬레이션] 가짜 로그아웃
+function fakeLogout() {
+    localStorage.removeItem("isLoggedIn");
+    alert("로그아웃 되었습니다.");
+    location.reload();
+}
+
+// 5. [기능] 찜하기 버튼 토글
+function toggleLike() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn !== "true") {
+        alert("로그인이 필요한 서비스입니다.");
         return;
     }
+    alert("영화가 찜 목록에 저장되었습니다! (DB 연동 예정)");
+}
+
+// --- 아래는 기존 검색, 렌더링, 모달 관련 코드 (그대로 유지) ---
+
+function searchMovies() {
+    const query = document.getElementById('searchInput').value;
+    if (!query) return alert("검색어를 입력하세요!");
     
     document.getElementById('sectionTitle').innerText = `'${query}' 검색 결과`;
-    
     fetch(`/test/search?q=${query}`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => renderMovies(data, 'movieContainer'));
 }
 
-// 3. 영화 목록 그리기 (공통 함수)
 function renderMovies(movies, containerId) {
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // 기존 내용 비우기
-
-    if (movies.length === 0) {
+    container.innerHTML = '';
+    if (!movies || movies.length === 0) {
         container.innerHTML = '<p>결과가 없습니다.</p>';
         return;
     }
-
     movies.forEach(movie => {
-        // 포스터가 없으면 회색 박스 처리
-        const posterSrc = movie.poster_path 
-            ? IMAGE_BASE_URL + movie.poster_path 
-            : 'https://via.placeholder.com/200x300?text=No+Image';
-
+        const posterSrc = movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : NO_POSTER_URL;
         const card = document.createElement('div');
         card.className = 'movie-card';
-        card.onclick = () => openModal(movie.id); // 클릭 시 상세 모달 열기
-
-        card.innerHTML = `
-            <img src="${posterSrc}" alt="${movie.title}">
-            <h3>${movie.title}</h3>
-        `;
+        card.onclick = () => openModal(movie.id);
+        card.innerHTML = `<img src="${posterSrc}" alt="${movie.title}"><h3>${movie.title}</h3>`;
         container.appendChild(card);
     });
 }
 
-// 4. 상세 정보 및 추천 영화 모달 열기
+// 상세 정보 모달 열기 (속도 개선 버전)
 function openModal(movieId) {
-    // 상세 정보 가져오기
+    const modal = document.getElementById('movieModal');
+    
+    // 1. [즉시 실행] 모달 창부터 띄운다 (기다리지 않음!)
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // 뒤에 배경 스크롤 막기
+
+    // 2. [로딩 상태] 기존 데이터를 비우거나 '로딩중' 표시
+    document.getElementById('modalPoster').src = "https://placehold.co/300x450/000000/ffffff?text=Loading...";
+    document.getElementById('modalTitle').innerText = "로딩 중...";
+    document.getElementById('modalOverview').innerText = "";
+    document.getElementById('recommendContainer').innerHTML = ""; // 추천 목록 비우기
+
+    // 3. [비동기] 그 다음에 데이터를 가져와서 채워넣는다 (사용자는 창이 뜬 상태에서 기다림)
     fetch(`/test/detail/${movieId}`)
         .then(res => res.json())
         .then(movie => {
             document.getElementById('modalTitle').innerText = movie.title;
-            document.getElementById('modalOverview').innerText = movie.overview || "줄거리 정보가 없습니다.";
+            document.getElementById('modalOverview').innerText = movie.overview || " ";
             document.getElementById('modalPoster').src = movie.poster_path 
                 ? IMAGE_BASE_URL + movie.poster_path 
-                : 'https://via.placeholder.com/300x450';
+                : "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
             
             // 추천 영화 가져오기
-            fetch(`/test/recommend/${movieId}`)
-                .then(res => res.json())
-                .then(recommends => renderRecommends(recommends));
-            
-            document.getElementById('movieModal').style.display = 'block';
+            return fetch(`/test/recommend/${movieId}`);
+        })
+        .then(res => res.json())
+        .then(recommends => renderRecommends(recommends))
+        .catch(err => {
+            console.error(err);
+            document.getElementById('modalTitle').innerText = "정보를 불러올 수 없습니다.";
         });
 }
 
-// 5. 모달 내부 추천 영화 그리기
+// 닫기 함수도 수정 (스크롤 풀기)
+function closeModal() {
+    document.getElementById('movieModal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // 스크롤 다시 허용
+}
+
 function renderRecommends(movies) {
     const container = document.getElementById('recommendContainer');
     container.innerHTML = '';
 
+    // ⭐ [추가] 데이터가 없거나 비어있으면 안내 메시지 출력
+    if (!movies || movies.length === 0) {
+        container.innerHTML = '<p class="no-data-msg">비슷한 작품 정보가 없습니다.</p>';
+        return;
+    }
+
     // 최대 4개만 보여주기
     movies.slice(0, 4).forEach(movie => {
+        // 이미지가 없으면 검은 배경 이미지 사용
         const posterSrc = movie.poster_path 
             ? IMAGE_BASE_URL + movie.poster_path 
-            : 'https://via.placeholder.com/100x150';
+            : "https://placehold.co/200x300/000000/ffffff?text=No+Poster";
 
         const card = document.createElement('div');
         card.className = 'recommend-card';
-        // 추천 영화 클릭하면 해당 영화 상세로 다시 이동 (재귀 호출)
+        // 추천 영화 클릭하면 해당 영화 상세로 이동 (재귀 호출)
         card.onclick = () => openModal(movie.id); 
         
         card.innerHTML = `
@@ -95,15 +158,9 @@ function renderRecommends(movies) {
     });
 }
 
-// 6. 모달 닫기
-function closeModal() {
-    document.getElementById('movieModal').style.display = 'none';
-}
+window.onclick = function(e) { if (e.target == document.getElementById('movieModal')) closeModal(); }
 
-// 모달 바깥 클릭 시 닫기
-window.onclick = function(event) {
-    const modal = document.getElementById('movieModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
+// 엔터키 검색 추가
+document.getElementById('searchInput').addEventListener("keypress", function(event) {
+    if (event.key === "Enter") searchMovies();
+});
