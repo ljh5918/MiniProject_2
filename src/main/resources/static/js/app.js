@@ -6,7 +6,7 @@ window.onload = function() {
     checkLoginStatus(); // 로그인 상태 확인
     
     // 인기 영화 불러오기 (공통)
-    fetch('/test/popular')
+    fetch('/movies/popular')
         .then(response => response.json())
         .then(data => renderMovies(data, 'movieContainer'));
 };
@@ -23,7 +23,7 @@ function checkLoginStatus() {
         document.getElementById("userName").innerText = "김개발"; // 가짜 이름
 
         // 개인 추천 영화 로드 (일단 인기 영화 API 재활용하거나 다른 API 호출)
-        fetch('/test/popular') 
+        fetch('/movies/popular') 
             .then(res => res.json())
             .then(data => renderMovies(data.slice(5, 10), 'personalContainer')); // 5개만 슬쩍 보여주기
     } else {
@@ -65,7 +65,7 @@ function searchMovies() {
     if (!query) return alert("검색어를 입력하세요!");
     
     document.getElementById('sectionTitle').innerText = `'${query}' 검색 결과`;
-    fetch(`/test/search?q=${query}`)
+    fetch(`/movies/search?q=${query}`)
         .then(res => res.json())
         .then(data => renderMovies(data, 'movieContainer'));
 }
@@ -102,7 +102,7 @@ function openModal(movieId) {
     document.getElementById('recommendContainer').innerHTML = ""; // 추천 목록 비우기
 
     // 3. [비동기] 그 다음에 데이터를 가져와서 채워넣는다 (사용자는 창이 뜬 상태에서 기다림)
-    fetch(`/test/detail/${movieId}`)
+    fetch(`/movies/detail/${movieId}`)
         .then(res => res.json())
         .then(movie => {
             document.getElementById('modalTitle').innerText = movie.title;
@@ -112,7 +112,7 @@ function openModal(movieId) {
                 : "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
             
             // 추천 영화 가져오기
-            return fetch(`/test/recommend/${movieId}`);
+            return fetch(`/movies/recommend/${movieId}`);
         })
         .then(res => res.json())
         .then(recommends => renderRecommends(recommends))
