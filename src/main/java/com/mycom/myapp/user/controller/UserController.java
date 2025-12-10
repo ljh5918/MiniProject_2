@@ -1,10 +1,23 @@
+
 package com.mycom.myapp.user.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.mycom.myapp.user.dto.UserDto;
+import com.mycom.myapp.user.dto.UserLoginDto;
 import com.mycom.myapp.user.dto.UserResultDto;
 import com.mycom.myapp.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,9 +25,63 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    
+	  @PostMapping("/register")
+	  public UserResultDto register(@RequestBody UserDto userDto) {
+	      return userService.register(userDto);
+	  }
 
-    @PostMapping("/register")
-    public UserResultDto register(@RequestBody UserDto userDto) {
-        return userService.register(userDto);
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserLoginDto userLoginDto) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // 로그인 시도
+            String accessToken = userService.login(userLoginDto);
+
+            // Access Token을 HttpOnly Cookie에 담기
+            ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                    .httpOnly(true)
+                    .secure(false) // 개발 환경: false / HTTPS 배포 시: true
+                    .sameSite("Lax")
+                    .maxAge(60 * 30) // 30분
+                    .path("/")
+                    .build();
+
+            result.put("status", "success");
+            result.put("message", "로그인 성공");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(result);
+
+        } catch (Exception e) {
+            // 로그인 실패 시
+            result.put("status", "fail");
+            result.put("message", "로그인 실패.");
+            return ResponseEntity.status(401).body(result);
+        }
     }
+    
+    
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout() {
+        Map<String, Object> result = new HashMap<>();
+
+        // 쿠키 만료 처리
+        ResponseCookie cookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .secure(false)      // 개발 환경: false / HTTPS 배포 시: true
+                .sameSite("Lax")
+                .maxAge(0)          // 즉시 만료
+                .path("/")
+                .build();
+
+        result.put("status", "success");
+        result.put("message", "로그아웃 성공");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(result);
+    }
+
 }

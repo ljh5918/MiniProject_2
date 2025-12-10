@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인/로그아웃 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        input, button { margin: 5px 0; padding: 8px; width: 300px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>로그인 테스트</h2>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="이메일" required><br>
+        <input type="password" id="password" placeholder="비밀번호" required><br>
+        <button type="submit">로그인</button>
+    </form>
+
+    <button id="logoutBtn">로그아웃</button>
+
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const resultDiv = document.getElementById('result');
+
+        // 로그인
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/user/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json(); // JSON으로 처리
+                if (result.status === 'success') {
+                    resultDiv.textContent = '로그인 성공!';
+                } else {
+                    resultDiv.textContent = '로그인 실패: ' + result.message;
+                }
+
+            } catch (err) {
+                resultDiv.textContent = '로그인 실패: ' + err.message;
+            }
+        });
+
+        // 로그아웃
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/user/logout', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    resultDiv.textContent = '로그아웃 성공!';
+                } else {
+                    resultDiv.textContent = '로그아웃 실패: ' + result.message;
+                }
+
+            } catch (err) {
+                resultDiv.textContent = '로그아웃 실패: ' + err.message;
+            }
+        });
+    </script>
+</body>
+</html>

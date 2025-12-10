@@ -1,10 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>MovieSense - 메인</title>
+    <style>
+        #navbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-	<h1>test</h1>
+<h1>MovieSense</h1>
+<hr>
+
+<!-- 기본 네비게이션 -->
+<div id="navbar">
+    <a href="/login.html" id="linkLogin">Login</a>
+    <a href="/register.html" id="linkRegister">Register</a>
+
+    <span id="userInfo" class="hide">
+        <span id="userName"></span> 님 안녕하세요 |
+        <a href="#" id="linkLogout">Logout</a> |
+        <a href="/board.html">Board</a>
+    </span>
+</div>
+
+<script>
+    // 페이지 로드 시 로그인 상태 확인
+    window.onload = function () {
+        checkLoginStatus();
+
+        // 로그아웃 버튼 이벤트
+        document.getElementById("linkLogout").onclick = logout;
+    }
+
+    // 🔹 로그인 상태 확인 (JWT 쿠키 기반)
+    async function checkLoginStatus() {
+        try {
+            const res = await fetch("/auth/me", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!res.ok) {
+                showLoggedOutView();
+                return;
+            }
+
+            const user = await res.json();
+            showLoggedInView(user);
+
+        } catch (err) {
+            console.error("로그인 상태 확인 오류:", err);
+            showLoggedOutView();
+        }
+    }
+
+    // 🔹 로그인된 화면 표시
+    function showLoggedInView(user) {
+        document.getElementById("userName").textContent = user.name || user.email;
+
+        // 로그인/회원가입 숨기기
+        document.getElementById("linkLogin").classList.add("hide");
+        document.getElementById("linkRegister").classList.add("hide");
+
+        // 사용자 메뉴 보이기
+        document.getElementById("userInfo").classList.remove("hide");
+    }
+
+    // 🔹 로그인 안된 화면 표시
+    function showLoggedOutView() {
+        document.getElementById("linkLogin").classList.remove("hide");
+        document.getElementById("linkRegister").classList.remove("hide");
+
+        document.getElementById("userInfo").classList.add("hide");
+    }
+
+    // 🔹 로그아웃 기능
+    async function logout() {
+        try {
+            await fetch("/auth/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+
+            alert("로그아웃 되었습니다!");
+            showLoggedOutView();
+        } catch (e) {
+            console.error("로그아웃 오류:", e);
+        }
+    }
+</script>
 </body>
 </html>
