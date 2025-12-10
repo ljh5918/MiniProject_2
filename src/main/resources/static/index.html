@@ -86,7 +86,7 @@
     window.onload = function () {
         checkLoginStatus();
 
-        fetch('/test/popular')
+        fetch('/movies/popular')
             .then(res => res.json())
             .then(data => renderMovies(data, 'movieContainer'));
     };
@@ -121,7 +121,7 @@
         document.getElementById("userName").innerText = user.name || user.email;
 
         // 추천 영화 로드
-        fetch('/test/popular')
+        fetch('/movies/popular')
             .then(res => res.json())
             .then(data => renderMovies(data.slice(5, 10), 'personalContainer'));
     }
