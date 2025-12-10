@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <title>MovieSense - 메인</title>
     <style>
         #navbar {
@@ -96,5 +97,78 @@
         }
     }
 </script>
+=======
+    <title>MovieSense - 나만의 영화 큐레이터</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="영화 제목 검색...">
+            <button onclick="searchMovies()">🔍</button>
+        </div>
+
+        <div class="auth-buttons">
+            <div id="guestNav">
+                <button class="btn-login" onclick="fakeLogin()">로그인</button>
+                <button class="btn-signup">회원가입</button>
+            </div>
+            
+            <div id="userNav" style="display: none;">
+                <span id="welcomeMsg">환영합니다!</span>
+                <button class="btn-mypage" onclick="alert('마이페이지 준비중')">⭐ 찜목록</button>
+                <button class="btn-logout" onclick="fakeLogout()">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="personalSection" style="display: none;">
+            <h2>✨ <span id="userName">User</span>님 취향 저격 영화</h2>
+            <div id="personalContainer" class="movie-grid"></div>
+            <hr class="divider">
+        </section>
+
+        <h2 id="sectionTitle">🔥 실시간 인기 영화</h2>
+        <div id="movieContainer" class="movie-grid"></div>
+    </main>
+
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-layout">
+                <div class="modal-left">
+                    <img id="modalPoster" src="" alt="포스터">
+                </div>
+
+                <div class="modal-right">
+                    
+                    <div class="modal-header-info">
+                        <h2 id="modalTitle">영화 제목</h2>
+                        <button class="btn-like" onclick="toggleLike()">❤ 찜하기</button>
+                    </div>
+
+                    <div class="modal-overview-box">
+                        <h3>줄거리</h3>
+                        <p id="modalOverview">줄거리 내용...</p>
+                    </div>
+
+                    <div class="modal-recommend-box">
+                        <h3>💡 이 영화와 비슷한 작품</h3>
+                        <div id="recommendContainer" class="recommend-grid">
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+>>>>>>> 54d922aaaa322d7404b195494cdcca6726932854
 </body>
 </html>
