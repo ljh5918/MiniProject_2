@@ -50,7 +50,23 @@ public class FavoriteController {
 
         return ResponseEntity.ok("success");
     }
+    
 
+
+
+//    @GetMapping("/list")
+//    public ResponseEntity<?> getFavorites(HttpServletRequest request) {
+//
+//        String token = extractToken(request);
+//        if (token == null || !jwtTokenProvider.validateToken(token)) {
+//            return ResponseEntity.status(401).body("Unauthorized");
+//        }
+//
+//        String email = jwtTokenProvider.getAuthentication(token).getName();
+//
+//        return ResponseEntity.ok(favoriteService.getFavorites(email));
+//    }
+    
     @GetMapping("/list")
     public ResponseEntity<?> getFavorites(HttpServletRequest request) {
 
@@ -63,4 +79,24 @@ public class FavoriteController {
 
         return ResponseEntity.ok(favoriteService.getFavorites(email));
     }
+
+    
+    // ✅ 찜 삭제 API
+    @PostMapping("/delete")
+    public ResponseEntity<?> deleteFavorite(@RequestBody Map<String, Object> body,
+                                            HttpServletRequest request) {
+
+        String token = extractToken(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        String email = jwtTokenProvider.getAuthentication(token).getName();
+        Long movieId = ((Number) body.get("movieId")).longValue();
+
+        favoriteService.deleteFavorite(email, movieId);
+        return ResponseEntity.ok("삭제 완료");
+    }
+
+
 }

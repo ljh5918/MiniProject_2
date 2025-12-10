@@ -1,55 +1,112 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>회원가입 테스트</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 50px; }
-        input, button { margin: 5px 0; padding: 8px; width: 300px; }
-        #result { margin-top: 20px; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<title>MovieSense - 회원가입</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* --- 상단 고정 헤더 --- */
+header {
+    display: flex;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #000;
+    color: #e50914;
+    font-size: 28px;
+    font-weight: 900;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
+}
+
+/* --- 회원가입 카드 --- */
+.auth-card {
+    background-color: #181818;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    width: 360px;
+    text-align: center;
+    margin-top: 80px; /* 헤더 겹침 방지 */
+}
+.auth-card h2 { color: #e5e5e5; margin-bottom: 25px; }
+.auth-card input {
+    width: 100%; padding: 12px; margin-bottom: 15px;
+    border: 1px solid #333; border-radius: 6px;
+    background: #222; color: #e5e5e5;
+}
+.auth-card button {
+    width: 100%; padding: 12px; border-radius: 6px;
+    border: none; background: #e50914; color: #fff;
+    font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.auth-card button:hover { background: #f6121d; }
+#result { margin-top: 15px; font-weight: bold; }
+.auth-link { margin-top: 15px; font-size: 14px; }
+.auth-link a { color: #e50914; text-decoration: none; }
+.auth-link a:hover { text-decoration: underline; }
+
+body {
+    background-color: #141414;
+    color: #e5e5e5;
+    font-family: 'Pretendard', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+</style>
 </head>
 <body>
-    <h2>회원가입 테스트</h2>
+
+<header onclick="location.href='/'">🎬 MovieSense</header>
+
+<div class="auth-card">
+    <h2>회원가입</h2>
     <form id="registerForm">
-        <input type="email" id="email" placeholder="이메일" required><br>
-        <input type="password" id="password" placeholder="비밀번호" required><br>
-        <input type="text" id="nickname" placeholder="닉네임" required><br>
+        <input type="email" id="email" placeholder="이메일" required>
+        <input type="password" id="password" placeholder="비밀번호" required>
+        <input type="text" id="nickname" placeholder="닉네임" required>
         <button type="submit">회원가입</button>
     </form>
-
     <div id="result"></div>
+    <div class="auth-link">
+        이미 계정이 있나요? <a href="/login.html">로그인</a>
+    </div>
+</div>
 
-    <script>
-        const form = document.getElementById('registerForm');
-        const resultDiv = document.getElementById('result');
+<script>
+const form = document.getElementById('registerForm');
+const resultDiv = document.getElementById('result');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const data = {
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                nickname: document.getElementById('nickname').value
-            };
-
-            try {
-                const response = await fetch('/user/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    throw new Error('회원가입 실패');
-                }
-
-                const result = await response.json();
-                resultDiv.textContent = `회원가입 성공! ID: ${result.userId}, 이메일: ${result.email}, 닉네임: ${result.nickname}`;
-            } catch (err) {
-                resultDiv.textContent = err.message;
-            }
+form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        nickname: document.getElementById('nickname').value
+    };
+    try {
+        const res = await fetch('/user/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
-    </script>
+        if (!res.ok) throw new Error('회원가입 실패');
+        const result = await res.json();
+        resultDiv.style.color = 'green';
+        resultDiv.textContent = `회원가입 성공! 이메일: ${result.email}, 닉네임: ${result.nickname}`;
+        setTimeout(() => window.location.href = '/login.html', 1000);
+    } catch (err) {
+        resultDiv.style.color = 'red';
+        resultDiv.textContent = '회원가입 실패: ' + err.message;
+    }
+});
+</script>
+
 </body>
 </html>

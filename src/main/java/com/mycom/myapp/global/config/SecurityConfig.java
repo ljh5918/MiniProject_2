@@ -37,6 +37,8 @@ public class SecurityConfig {
                         		"/movies/**",
                         		"/css/**", "/js/**", "/img/**",
                         		"/favorite/**",
+                        		"/mypage/**",
+                        		"/mypage.html",
                         		"/user/**"
                         		).permitAll()  // 회원가입/로그인 모두 허용
                         .anyRequest().authenticated()             

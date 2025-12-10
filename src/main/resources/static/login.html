@@ -1,84 +1,110 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>로그인/로그아웃 테스트</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 50px; }
-        input, button { margin: 5px 0; padding: 8px; width: 300px; }
-        #result { margin-top: 20px; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<title>MovieSense - 로그인</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* --- 상단 고정 헤더 --- */
+header {
+    display: flex;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #000;
+    color: #e50914;
+    font-size: 28px;
+    font-weight: 900;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
+}
+
+/* --- 로그인 카드 --- */
+.auth-card {
+    background-color: #181818;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    width: 360px;
+    text-align: center;
+    margin-top: 80px; /* 헤더 겹침 방지 */
+}
+.auth-card h2 { color: #e5e5e5; margin-bottom: 25px; }
+.auth-card input {
+    width: 100%; padding: 12px; margin-bottom: 15px;
+    border: 1px solid #333; border-radius: 6px;
+    background: #222; color: #e5e5e5;
+}
+.auth-card button {
+    width: 100%; padding: 12px; border-radius: 6px;
+    border: none; background: #e50914; color: #fff;
+    font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.auth-card button:hover { background: #f6121d; }
+#result { margin-top: 15px; font-weight: bold; }
+.auth-link { margin-top: 15px; font-size: 14px; }
+.auth-link a { color: #e50914; text-decoration: none; }
+.auth-link a:hover { text-decoration: underline; }
+
+body {
+    background-color: #141414;
+    color: #e5e5e5;
+    font-family: 'Pretendard', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+</style>
 </head>
 <body>
-    <h2>로그인 테스트</h2>
+
+<header onclick="location.href='/'">🎬 MovieSense</header>
+
+<div class="auth-card">
+    <h2>로그인</h2>
     <form id="loginForm">
-        <input type="email" id="email" placeholder="이메일" required><br>
-        <input type="password" id="password" placeholder="비밀번호" required><br>
+        <input type="email" id="email" placeholder="이메일" required>
+        <input type="password" id="password" placeholder="비밀번호" required>
         <button type="submit">로그인</button>
     </form>
-
-    <button id="logoutBtn">로그아웃</button>
-
     <div id="result"></div>
+    <div class="auth-link">
+        계정이 없으신가요? <a href="/register.html">회원가입</a>
+    </div>
+</div>
 
-    <script>
-        const form = document.getElementById('loginForm');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const resultDiv = document.getElementById('result');
+<script>
+const form = document.getElementById('loginForm');
+const resultDiv = document.getElementById('result');
 
-        // 로그인
-		form.addEventListener('submit', async (e) => {
-		    e.preventDefault();
-		
-		    const data = {
-		        email: document.getElementById('email').value,
-		        password: document.getElementById('password').value
-		    };
-		
-		    try {
-		        const response = await fetch('/user/login', {
-		            method: 'POST',
-		            headers: { 'Content-Type': 'application/json' },
-		            body: JSON.stringify(data),
-		            credentials: 'include'  // 쿠키 저장됨 (중요)
-		        });
-		
-		        const result = await response.json(); 
-		
-		        if (result.status === 'success') {
-		            resultDiv.textContent = '로그인 성공!';
-		
-		            // 🔥 로그인 성공 시 index.html로 이동!
-		            window.location.href = result.redirect;  
-		            return;
-		        }
-		
-		        resultDiv.textContent = '로그인 실패: ' + result.message;
-		
-		    } catch (err) {
-		        resultDiv.textContent = '로그인 실패: ' + err.message;
-		    }
-		});
-
-
-        // 로그아웃
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/user/logout', {
-                    method: 'POST'
-                });
-
-                const result = await response.json();
-                if (result.status === 'success') {
-                    resultDiv.textContent = '로그아웃 성공!';
-                } else {
-                    resultDiv.textContent = '로그아웃 실패: ' + result.message;
-                }
-
-            } catch (err) {
-                resultDiv.textContent = '로그아웃 실패: ' + err.message;
-            }
+form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    };
+    try {
+        const res = await fetch('/user/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
-    </script>
+        if (!res.ok) throw new Error('로그인 실패');
+        const result = await res.json();
+        resultDiv.style.color = 'green';
+        resultDiv.textContent = result.message || '로그인 성공';
+        setTimeout(() => window.location.href = result.redirect || '/', 500);
+    } catch (err) {
+        resultDiv.style.color = 'red';
+        resultDiv.textContent = '로그인 실패: ' + err.message;
+    }
+});
+</script>
+
 </body>
 </html>
