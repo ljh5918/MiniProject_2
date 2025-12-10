@@ -2,173 +2,150 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-<<<<<<< HEAD
-    <title>MovieSense - 메인</title>
-    <style>
-        #navbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .hide {
-            display: none;
-        }
-    </style>
+    <title>MovieSense - 나만의 영화 큐레이터</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-<h1>MovieSense</h1>
-<hr>
 
-<!-- 기본 네비게이션 -->
-<div id="navbar">
-    <a href="/login.html" id="linkLogin">Login</a>
-    <a href="/register.html" id="linkRegister">Register</a>
+<header>
+    <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
 
-    <span id="userInfo" class="hide">
-        <span id="userName"></span> 님 안녕하세요 |
-        <a href="#" id="linkLogout">Logout</a> |
-        <a href="/board.html">Board</a>
-    </span>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="영화 제목 검색...">
+        <button onclick="searchMovies()">🔍</button>
+    </div>
+
+    <div class="auth-buttons">
+        <!-- 🔹 비로그인 UI -->
+        <div id="guestNav">
+            <a href="/login.html"><button class="btn-login">로그인</button></a>
+            <a href="/register.html"><button class="btn-signup">회원가입</button></a>
+        </div>
+
+        <!-- 🔹 로그인 UI -->
+        <div id="userNav" style="display: none;">
+            <span id="welcomeMsg">환영합니다!</span>
+            <button class="btn-mypage" onclick="location.href='/board.html'">⭐ 게시판</button>
+            <button class="btn-logout" onclick="logout()">로그아웃</button>
+        </div>
+    </div>
+</header>
+
+
+<main>
+    <!-- 🔹 로그인 사용자 추천 -->
+    <section id="personalSection" style="display: none;">
+        <h2>✨ <span id="userName">User</span>님 취향 저격 영화</h2>
+        <div id="personalContainer" class="movie-grid"></div>
+        <hr class="divider">
+    </section>
+
+    <h2 id="sectionTitle">🔥 실시간 인기 영화</h2>
+    <div id="movieContainer" class="movie-grid"></div>
+</main>
+
+<!-- 🔹 모달 -->
+<div id="movieModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+
+        <div class="modal-layout">
+            <div class="modal-left">
+                <img id="modalPoster" src="" alt="포스터">
+            </div>
+
+            <div class="modal-right">
+
+                <div class="modal-header-info">
+                    <h2 id="modalTitle">영화 제목</h2>
+                    <button class="btn-like" onclick="toggleLike()">❤ 찜하기</button>
+                </div>
+
+                <div class="modal-overview-box">
+                    <h3>줄거리</h3>
+                    <p id="modalOverview">줄거리 내용...</p>
+                </div>
+
+                <div class="modal-recommend-box">
+                    <h3>💡 이 영화와 비슷한 작품</h3>
+                    <div id="recommendContainer" class="recommend-grid"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
+
+<script src="/js/app.js"></script>
+
+<!-- 🔥 JWT 로그인 상태 처리 스크립트 추가 -->
 <script>
-    // 페이지 로드 시 로그인 상태 확인
+    // 페이지 로드 시 로그인 상태 확인 + 영화 로드
     window.onload = function () {
         checkLoginStatus();
 
-        // 로그아웃 버튼 이벤트
-        document.getElementById("linkLogout").onclick = logout;
-    }
+        fetch('/test/popular')
+            .then(res => res.json())
+            .then(data => renderMovies(data, 'movieContainer'));
+    };
 
-    // 🔹 로그인 상태 확인 (JWT 쿠키 기반)
+    // 🔹 JWT 로그인 상태 확인
     async function checkLoginStatus() {
         try {
-            const res = await fetch("/auth/me", {
+            const res = await fetch("/user/me", {   // ← 수정됨 (/auth/me → /user/me)
                 method: "GET",
                 credentials: "include"
             });
 
             if (!res.ok) {
-                showLoggedOutView();
-                return;
+                return showGuestNav();
             }
 
             const user = await res.json();
-            showLoggedInView(user);
+            showUserNav(user);
 
-        } catch (err) {
-            console.error("로그인 상태 확인 오류:", err);
-            showLoggedOutView();
-        }
-    }
-
-    // 🔹 로그인된 화면 표시
-    function showLoggedInView(user) {
-        document.getElementById("userName").textContent = user.name || user.email;
-
-        // 로그인/회원가입 숨기기
-        document.getElementById("linkLogin").classList.add("hide");
-        document.getElementById("linkRegister").classList.add("hide");
-
-        // 사용자 메뉴 보이기
-        document.getElementById("userInfo").classList.remove("hide");
-    }
-
-    // 🔹 로그인 안된 화면 표시
-    function showLoggedOutView() {
-        document.getElementById("linkLogin").classList.remove("hide");
-        document.getElementById("linkRegister").classList.remove("hide");
-
-        document.getElementById("userInfo").classList.add("hide");
-    }
-
-    // 🔹 로그아웃 기능
-    async function logout() {
-        try {
-            await fetch("/auth/logout", {
-                method: "POST",
-                credentials: "include"
-            });
-
-            alert("로그아웃 되었습니다!");
-            showLoggedOutView();
         } catch (e) {
-            console.error("로그아웃 오류:", e);
+            console.error(e);
+            showGuestNav();
         }
+    }
+
+    // 🔹 로그인 상태 UI 적용
+    function showUserNav(user) {
+        document.getElementById("guestNav").style.display = "none";
+        document.getElementById("userNav").style.display = "block";
+
+        document.getElementById("personalSection").style.display = "block";
+        document.getElementById("userName").innerText = user.name || user.email;
+
+        // 추천 영화 로드
+        fetch('/test/popular')
+            .then(res => res.json())
+            .then(data => renderMovies(data.slice(5, 10), 'personalContainer'));
+    }
+
+    // 🔹 비로그인 UI
+    function showGuestNav() {
+        document.getElementById("guestNav").style.display = "block";
+        document.getElementById("userNav").style.display = "none";
+        document.getElementById("personalSection").style.display = "none";
+    }
+
+    // 🔹 로그아웃
+    async function logout() {
+        await fetch("/user/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        alert("로그아웃 완료");
+        location.reload();
     }
 </script>
-=======
-    <title>MovieSense - 나만의 영화 큐레이터</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
 
-    <header>
-        <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
-        
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="영화 제목 검색...">
-            <button onclick="searchMovies()">🔍</button>
-        </div>
 
-        <div class="auth-buttons">
-            <div id="guestNav">
-                <button class="btn-login" onclick="fakeLogin()">로그인</button>
-                <button class="btn-signup">회원가입</button>
-            </div>
-            
-            <div id="userNav" style="display: none;">
-                <span id="welcomeMsg">환영합니다!</span>
-                <button class="btn-mypage" onclick="alert('마이페이지 준비중')">⭐ 찜목록</button>
-                <button class="btn-logout" onclick="fakeLogout()">로그아웃</button>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <section id="personalSection" style="display: none;">
-            <h2>✨ <span id="userName">User</span>님 취향 저격 영화</h2>
-            <div id="personalContainer" class="movie-grid"></div>
-            <hr class="divider">
-        </section>
-
-        <h2 id="sectionTitle">🔥 실시간 인기 영화</h2>
-        <div id="movieContainer" class="movie-grid"></div>
-    </main>
-
-    <div id="movieModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            
-            <div class="modal-layout">
-                <div class="modal-left">
-                    <img id="modalPoster" src="" alt="포스터">
-                </div>
-
-                <div class="modal-right">
-                    
-                    <div class="modal-header-info">
-                        <h2 id="modalTitle">영화 제목</h2>
-                        <button class="btn-like" onclick="toggleLike()">❤ 찜하기</button>
-                    </div>
-
-                    <div class="modal-overview-box">
-                        <h3>줄거리</h3>
-                        <p id="modalOverview">줄거리 내용...</p>
-                    </div>
-
-                    <div class="modal-recommend-box">
-                        <h3>💡 이 영화와 비슷한 작품</h3>
-                        <div id="recommendContainer" class="recommend-grid">
-                            </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="/js/app.js"></script>
->>>>>>> 54d922aaaa322d7404b195494cdcca6726932854
 </body>
 </html>
+

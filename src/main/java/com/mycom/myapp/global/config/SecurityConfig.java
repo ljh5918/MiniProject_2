@@ -34,7 +34,11 @@ public class SecurityConfig {
                         		"/index.html", 
                         		"/register.html",
                         		"/login.html",
-                        		"/user/**").permitAll()  // 회원가입/로그인 모두 허용
+                        		"/test/**",
+                        		"/css/**", "/js/**", "/img/**",
+                        		"/favorite/**",
+                        		"/user/**"
+                        		).permitAll()  // 회원가입/로그인 모두 허용
                         .anyRequest().authenticated()             
                 )
                 .formLogin(login -> login.disable()) 

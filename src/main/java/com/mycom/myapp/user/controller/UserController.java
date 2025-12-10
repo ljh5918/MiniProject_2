@@ -7,6 +7,9 @@ import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,36 +34,37 @@ public class UserController {
 	      return userService.register(userDto);
 	  }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserLoginDto userLoginDto) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            // 로그인 시도
-            String accessToken = userService.login(userLoginDto);
+	  @PostMapping("/login")
+	  public ResponseEntity<Map<String, Object>> login(@RequestBody UserLoginDto userLoginDto) {
+	      Map<String, Object> result = new HashMap<>();
+	      try {
+	          // 로그인 시도
+	          String accessToken = userService.login(userLoginDto);
 
-            // Access Token을 HttpOnly Cookie에 담기
-            ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
-                    .httpOnly(true)
-                    .secure(false) // 개발 환경: false / HTTPS 배포 시: true
-                    .sameSite("Lax")
-                    .maxAge(60 * 30) // 30분
-                    .path("/")
-                    .build();
+	          // Access Token을 HttpOnly Cookie에 담기
+	          ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+	                  .httpOnly(true)
+	                  .secure(false)
+	                  .sameSite("Lax")
+	                  .maxAge(60 * 30)
+	                  .path("/")
+	                  .build();
 
-            result.put("status", "success");
-            result.put("message", "로그인 성공");
+	          result.put("status", "success");
+	          result.put("message", "로그인 성공");
+	          result.put("redirect", "/");   // 🔥 메인 페이지로 이동시키기
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(result);
+	          return ResponseEntity.ok()
+	                  .header(HttpHeaders.SET_COOKIE, cookie.toString())
+	                  .body(result);
 
-        } catch (Exception e) {
-            // 로그인 실패 시
-            result.put("status", "fail");
-            result.put("message", "로그인 실패.");
-            return ResponseEntity.status(401).body(result);
-        }
-    }
+	      } catch (Exception e) {
+	          result.put("status", "fail");
+	          result.put("message", "로그인 실패.");
+	          return ResponseEntity.status(401).body(result);
+	      }
+	  }
+
     
     
     @PostMapping("/logout")
@@ -83,5 +87,26 @@ public class UserController {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(result);
     }
+    
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyInfo() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        // JwtTokenProvider.getAuthentication() 에서 subject = email 로 설정했음
+        String email = authentication.getName();
+
+        UserDto user = userService.getUserProfile(email);
+
+        return ResponseEntity.ok(user);
+    }
+
+
+    
 
 }

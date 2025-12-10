@@ -27,32 +27,39 @@
         const resultDiv = document.getElementById('result');
 
         // 로그인
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+		form.addEventListener('submit', async (e) => {
+		    e.preventDefault();
+		
+		    const data = {
+		        email: document.getElementById('email').value,
+		        password: document.getElementById('password').value
+		    };
+		
+		    try {
+		        const response = await fetch('/user/login', {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json' },
+		            body: JSON.stringify(data),
+		            credentials: 'include'  // 쿠키 저장됨 (중요)
+		        });
+		
+		        const result = await response.json(); 
+		
+		        if (result.status === 'success') {
+		            resultDiv.textContent = '로그인 성공!';
+		
+		            // 🔥 로그인 성공 시 index.html로 이동!
+		            window.location.href = result.redirect;  
+		            return;
+		        }
+		
+		        resultDiv.textContent = '로그인 실패: ' + result.message;
+		
+		    } catch (err) {
+		        resultDiv.textContent = '로그인 실패: ' + err.message;
+		    }
+		});
 
-            const data = {
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            };
-
-            try {
-                const response = await fetch('/user/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json(); // JSON으로 처리
-                if (result.status === 'success') {
-                    resultDiv.textContent = '로그인 성공!';
-                } else {
-                    resultDiv.textContent = '로그인 실패: ' + result.message;
-                }
-
-            } catch (err) {
-                resultDiv.textContent = '로그인 실패: ' + err.message;
-            }
-        });
 
         // 로그아웃
         logoutBtn.addEventListener('click', async () => {

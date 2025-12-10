@@ -60,6 +60,18 @@ public class UserServiceImpl implements UserService {
 
         return accessToken;
     }
+    
+    @Override
+    public UserDto getUserProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        return UserDto.builder()
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
+    }
+
 }
 
 
