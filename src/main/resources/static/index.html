@@ -1,30 +1,41 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>MovieSense - 나만의 영화 큐레이터</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        /* (간단한 인라인 스타일 — 이미 있는 style.css와 충돌 안 나도록 최소화) */
+        .comment-section { margin-top:18px; border-top:1px solid #333; padding-top:12px; }
+        #commentList .comment-item { background:#141414; padding:10px; margin-bottom:8px; border-radius:6px; }
+        #commentList .meta { font-size:12px; color:#999; margin-bottom:6px; }
+        #commentInput { width:100%; min-height:64px; background:#222; color:#e5e5e5; border:1px solid #333; padding:8px; border-radius:6px; }
+        #commentSubmitBtn { margin-top:8px; padding:8px 12px; background:#e50914; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+        .comment-actions button { margin-right:6px; padding:4px 8px; font-size:13px; cursor:pointer; }
+    </style>
 </head>
-
 <body>
 
 <header>
     <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
 
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="영화 제목 검색...">
+        <input type="text" id="searchInput" placeholder="영화 제목 검색..." />
         <button onclick="searchMovies()">🔍</button>
     </div>
 
     <div class="auth-buttons">
-        <!-- 🔹 비로그인 UI -->
         <div id="guestNav">
             <a href="/login.html"><button class="btn-login">로그인</button></a>
             <a href="/register.html"><button class="btn-signup">회원가입</button></a>
         </div>
 
-        <!-- 🔹 로그인 UI -->
-        <div id="userNav" style="display: none;">
+        <div id="userNav" style="display:none;">
             <span id="welcomeMsg">환영합니다!</span>
             <button class="btn-mypage" onclick="location.href='/mypage.html'">⭐ my</button>
             <button class="btn-logout" onclick="logout()">로그아웃</button>
@@ -32,55 +43,69 @@
     </div>
 </header>
 
-
 <main>
-    <!-- 🔹 로그인 사용자 추천 -->
-    <section id="personalSection" style="display: none;">
+    <section id="personalSection" style="display:none;">
         <h2>✨ <span id="userName">User</span>님 취향 저격 영화</h2>
         <div id="personalContainer" class="movie-grid"></div>
-        <hr class="divider">
+        <hr class="divider" />
     </section>
 
     <h2 id="sectionTitle">🔥 실시간 인기 영화</h2>
     <div id="movieContainer" class="movie-grid"></div>
 </main>
 
-<!-- 🔹 모달 -->
-<div id="movieModal" class="modal">
+<!-- 모달 -->
+<div id="movieModal" class="modal" style="display:none;">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
 
-        <div class="modal-layout">
-            <div class="modal-left">
-                <img id="modalPoster" src="" alt="포스터">
+        <div class="modal-layout" style="display:flex; gap:20px;">
+            <div class="modal-left" style="width:40%;">
+                <img id="modalPoster" src="" alt="포스터" style="width:100%; height:100%; object-fit:cover;" />
             </div>
 
-            <div class="modal-right">
-
-                <div class="modal-header-info">
+            <div class="modal-right" style="width:60%;">
+                <div class="modal-header-info" style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <h2 id="modalTitle">영화 제목</h2>
-                    <button class="btn-like" onclick="toggleLike()">❤ 찜하기</button>
+                    <div>
+                        <button id="modalLikeBtn" class="btn-like">❤ 찜하기</button>
+                    </div>
                 </div>
 
-                <div class="modal-overview-box">
+                <div class="modal-overview-box" style="margin-top:8px;">
                     <h3>줄거리</h3>
                     <p id="modalOverview">줄거리 내용...</p>
                 </div>
 
-                <div class="modal-recommend-box">
+                <div class="modal-recommend-box" style="margin-top:12px;">
                     <h3>💡 이 영화와 비슷한 작품</h3>
                     <div id="recommendContainer" class="recommend-grid"></div>
                 </div>
 
+                <!-- 댓글 섹션 -->
+                <div class="comment-section">
+                    <h3>💬 영화 후기</h3>
+
+                    <textarea id="commentInput" placeholder="댓글을 입력하세요..."></textarea>
+                    <div>
+                        <button id="commentSubmitBtn">댓글 등록</button>
+                    </div>
+
+                    <div id="commentList" style="margin-top:12px;"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<script src="/js/app.js"></script>
 
-<!-- 🔥 JWT 로그인 상태 처리 스크립트 추가 -->
+
+
+
+<script src="/js/app.js"></script> 
+
+<!-- <!-- 🔥 JWT 로그인 상태 처리 스크립트 추가 --> -->
 <script>
     // 페이지 로드 시 로그인 상태 확인 + 영화 로드
     window.onload = function () {
@@ -143,9 +168,7 @@
         alert("로그아웃 완료");
         location.reload();
     }
-</script>
-
-
+ </script> 
 </body>
 </html>
 

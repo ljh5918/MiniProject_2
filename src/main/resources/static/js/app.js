@@ -1,192 +1,38 @@
-////const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-////// ▼ [추가] 포스터 없을 때 보여줄 대체 이미지 (검은 배경 + No Poster 텍스트)
-////const NO_POSTER_URL = "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
-////// 1. 페이지 로드 시 실행
-////window.onload = function() {
-////    checkLoginStatus(); // 로그인 상태 확인
-////    
-////    // 인기 영화 불러오기 (공통)
-////    fetch('/test/popular')
-////        .then(response => response.json())
-////        .then(data => renderMovies(data, 'movieContainer'));
-////};
-////
-////// 2. 로그인 상태 체크 및 화면 전환
-////function checkLoginStatus() {
-////    const isLoggedIn = localStorage.getItem("isLoggedIn"); // 브라우저 저장소 확인
-////
-////    if (isLoggedIn === "true") {
-////        // 로그인 상태 UI
-////        document.getElementById("guestNav").style.display = "none";
-////        document.getElementById("userNav").style.display = "block";
-////        document.getElementById("personalSection").style.display = "block";
-////        document.getElementById("userName").innerText = "김개발"; // 가짜 이름
-////
-////        // 개인 추천 영화 로드 (일단 인기 영화 API 재활용하거나 다른 API 호출)
-////        fetch('/test/popular') 
-////            .then(res => res.json())
-////            .then(data => renderMovies(data.slice(5, 10), 'personalContainer')); // 5개만 슬쩍 보여주기
-////    } else {
-////        // 비로그인 상태 UI
-////        document.getElementById("guestNav").style.display = "block";
-////        document.getElementById("userNav").style.display = "none";
-////        document.getElementById("personalSection").style.display = "none";
-////    }
-////}
-////
-////// 3. [시뮬레이션] 가짜 로그인
-////function fakeLogin() {
-////    localStorage.setItem("isLoggedIn", "true");
-////    alert("로그인 되었습니다! (테스트용)");
-////    location.reload(); // 새로고침해서 UI 반영
-////}
-////
-////// 4. [시뮬레이션] 가짜 로그아웃
-////function fakeLogout() {
-////    localStorage.removeItem("isLoggedIn");
-////    alert("로그아웃 되었습니다.");
-////    location.reload();
-////}
-////
-////// 5. [기능] 찜하기 버튼 토글
-////function toggleLike() {
-////    const isLoggedIn = localStorage.getItem("isLoggedIn");
-////    if (isLoggedIn !== "true") {
-////        alert("로그인이 필요한 서비스입니다.");
-////        return;
-////    }
-////    alert("영화가 찜 목록에 저장되었습니다! (DB 연동 예정)");
-////}
-////
-////// --- 아래는 기존 검색, 렌더링, 모달 관련 코드 (그대로 유지) ---
-////
-////function searchMovies() {
-////    const query = document.getElementById('searchInput').value;
-////    if (!query) return alert("검색어를 입력하세요!");
-////    
-////    document.getElementById('sectionTitle').innerText = `'${query}' 검색 결과`;
-////    fetch(`/test/search?q=${query}`)
-////        .then(res => res.json())
-////        .then(data => renderMovies(data, 'movieContainer'));
-////}
-////
-////function renderMovies(movies, containerId) {
-////    const container = document.getElementById(containerId);
-////    container.innerHTML = '';
-////    if (!movies || movies.length === 0) {
-////        container.innerHTML = '<p>결과가 없습니다.</p>';
-////        return;
-////    }
-////    movies.forEach(movie => {
-////        const posterSrc = movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : NO_POSTER_URL;
-////        const card = document.createElement('div');
-////        card.className = 'movie-card';
-////        card.onclick = () => openModal(movie.id);
-////        card.innerHTML = `<img src="${posterSrc}" alt="${movie.title}"><h3>${movie.title}</h3>`;
-////        container.appendChild(card);
-////    });
-////}
-////
-////// 상세 정보 모달 열기 (속도 개선 버전)
-////function openModal(movieId) {
-////    const modal = document.getElementById('movieModal');
-////    
-////    // 1. [즉시 실행] 모달 창부터 띄운다 (기다리지 않음!)
-////    modal.style.display = 'block';
-////    document.body.style.overflow = 'hidden'; // 뒤에 배경 스크롤 막기
-////
-////    // 2. [로딩 상태] 기존 데이터를 비우거나 '로딩중' 표시
-////    document.getElementById('modalPoster').src = "https://placehold.co/300x450/000000/ffffff?text=Loading...";
-////    document.getElementById('modalTitle').innerText = "로딩 중...";
-////    document.getElementById('modalOverview').innerText = "";
-////    document.getElementById('recommendContainer').innerHTML = ""; // 추천 목록 비우기
-////
-////    // 3. [비동기] 그 다음에 데이터를 가져와서 채워넣는다 (사용자는 창이 뜬 상태에서 기다림)
-////    fetch(`/test/detail/${movieId}`)
-////        .then(res => res.json())
-////        .then(movie => {
-////            document.getElementById('modalTitle').innerText = movie.title;
-////            document.getElementById('modalOverview').innerText = movie.overview || " ";
-////            document.getElementById('modalPoster').src = movie.poster_path 
-////                ? IMAGE_BASE_URL + movie.poster_path 
-////                : "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
-////            
-////            // 추천 영화 가져오기
-////            return fetch(`/test/recommend/${movieId}`);
-////        })
-////        .then(res => res.json())
-////        .then(recommends => renderRecommends(recommends))
-////        .catch(err => {
-////            console.error(err);
-////            document.getElementById('modalTitle').innerText = "정보를 불러올 수 없습니다.";
-////        });
-////}
-////
-////// 닫기 함수도 수정 (스크롤 풀기)
-////function closeModal() {
-////    document.getElementById('movieModal').style.display = 'none';
-////    document.body.style.overflow = 'auto'; // 스크롤 다시 허용
-////}
-////
-////function renderRecommends(movies) {
-////    const container = document.getElementById('recommendContainer');
-////    container.innerHTML = '';
-////
-////    // ⭐ [추가] 데이터가 없거나 비어있으면 안내 메시지 출력
-////    if (!movies || movies.length === 0) {
-////        container.innerHTML = '<p class="no-data-msg">비슷한 작품 정보가 없습니다.</p>';
-////        return;
-////    }
-////
-////    // 최대 4개만 보여주기
-////    movies.slice(0, 4).forEach(movie => {
-////        // 이미지가 없으면 검은 배경 이미지 사용
-////        const posterSrc = movie.poster_path 
-////            ? IMAGE_BASE_URL + movie.poster_path 
-////            : "https://placehold.co/200x300/000000/ffffff?text=No+Poster";
-////
-////        const card = document.createElement('div');
-////        card.className = 'recommend-card';
-////        // 추천 영화 클릭하면 해당 영화 상세로 이동 (재귀 호출)
-////        card.onclick = () => openModal(movie.id); 
-////        
-////        card.innerHTML = `
-////            <img src="${posterSrc}">
-////            <p>${movie.title}</p>
-////        `;
-////        container.appendChild(card);
-////    });
-////}
-////
-////window.onclick = function(e) { if (e.target == document.getElementById('movieModal')) closeModal(); }
-////
-////// 엔터키 검색 추가
-////document.getElementById('searchInput').addEventListener("keypress", function(event) {
-////    if (event.key === "Enter") searchMovies();
-////});
-//
+/** -------------------------------------------
+ *  기본 설정
+ --------------------------------------------*/
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 const NO_POSTER_URL = "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
 
-let currentMovie = null; // 모달에서 현재 영화 정보 저장
+let currentMovie = null;  // 모달에서 선택된 영화 저장
 
-// 1️⃣ 페이지 로드 시 실행
-window.onload = function() {
-    checkLoginStatus(); // 로그인 상태 확인
 
-    // 인기 영화 불러오기
+/** -------------------------------------------
+ *  1. 페이지 로드
+ --------------------------------------------*/
+window.onload = function () {
+    checkLoginStatus();
+
     fetch('/test/popular')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => renderMovies(data, 'movieContainer'));
 };
 
-// 2️⃣ 로그인 상태 체크 및 UI 적용
+
+/** -------------------------------------------
+ *  2. 로그인 UI 처리
+ --------------------------------------------*/
 async function checkLoginStatus() {
     try {
-        const res = await fetch("/user/me", { method: "GET", credentials: "include" });
+        const res = await fetch("/user/me", {
+            method: "GET",
+            credentials: "include"
+        });
+
         if (!res.ok) {
             return showGuestNav();
         }
+
         const user = await res.json();
         showUserNav(user);
 
@@ -196,48 +42,56 @@ async function checkLoginStatus() {
     }
 }
 
-// 로그인 UI 적용
 function showUserNav(user) {
     document.getElementById("guestNav").style.display = "none";
     document.getElementById("userNav").style.display = "block";
     document.getElementById("personalSection").style.display = "block";
     document.getElementById("userName").innerText = user.nickname || user.email;
 
-    // 개인 추천 영화 (임시: 인기 영화 5~10번)
     fetch('/test/popular')
         .then(res => res.json())
         .then(data => renderMovies(data.slice(5, 10), 'personalContainer'));
 }
 
-// 비로그인 UI
 function showGuestNav() {
     document.getElementById("guestNav").style.display = "block";
     document.getElementById("userNav").style.display = "none";
     document.getElementById("personalSection").style.display = "none";
 }
 
-// 3️⃣ 로그아웃
+
+/** -------------------------------------------
+ *  3. 로그아웃
+ --------------------------------------------*/
 async function logout() {
     await fetch("/user/logout", { method: "POST", credentials: "include" });
     alert("로그아웃 완료");
     location.reload();
 }
 
-// 4️⃣ 영화 검색
+
+/** -------------------------------------------
+ *  4. 영화 검색
+ --------------------------------------------*/
 function searchMovies() {
     const query = document.getElementById('searchInput').value;
     if (!query) return alert("검색어를 입력하세요!");
 
     document.getElementById('sectionTitle').innerText = `'${query}' 검색 결과`;
+
     fetch(`/test/search?q=${query}`)
         .then(res => res.json())
         .then(data => renderMovies(data, 'movieContainer'));
 }
 
-// 5️⃣ 영화 렌더링
+
+/** -------------------------------------------
+ *  5. 영화 카드 렌더링
+ --------------------------------------------*/
 function renderMovies(movies, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
+
     if (!movies || movies.length === 0) {
         container.innerHTML = '<p>결과가 없습니다.</p>';
         return;
@@ -245,17 +99,27 @@ function renderMovies(movies, containerId) {
 
     movies.forEach(movie => {
         const posterSrc = movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : NO_POSTER_URL;
+
         const card = document.createElement('div');
         card.className = 'movie-card';
         card.onclick = () => openModal(movie);
-        card.innerHTML = `<img src="${posterSrc}" alt="${movie.title}"><h3>${movie.title}</h3>`;
+
+        card.innerHTML = `
+            <img src="${posterSrc}" alt="${movie.title}">
+            <h3>${movie.title}</h3>
+        `;
+
         container.appendChild(card);
     });
 }
 
-// 6️⃣ 모달 열기
+
+/** -------------------------------------------
+ *  6. 모달 열기 (영화 + 댓글)
+ --------------------------------------------*/
 function openModal(movie) {
     currentMovie = movie;
+
     const modal = document.getElementById('movieModal');
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -265,59 +129,75 @@ function openModal(movie) {
     document.getElementById('modalOverview').innerText = "";
     document.getElementById('recommendContainer').innerHTML = "";
 
-    // 영화 상세 정보 호출
+    // 영화 상세 정보 로드
     fetch(`/test/detail/${movie.id}`)
         .then(res => res.json())
         .then(detail => {
             document.getElementById('modalTitle').innerText = detail.title;
             document.getElementById('modalOverview').innerText = detail.overview || "줄거리 정보 없음";
-            document.getElementById('modalPoster').src = detail.poster_path ? IMAGE_BASE_URL + detail.poster_path : NO_POSTER_URL;
+            document.getElementById('modalPoster').src =
+                detail.poster_path ? IMAGE_BASE_URL + detail.poster_path : NO_POSTER_URL;
 
-            // 추천 영화 가져오기
             return fetch(`/test/recommend/${movie.id}`);
         })
         .then(res => res.json())
         .then(recommends => renderRecommends(recommends))
-        .catch(err => {
-            console.error(err);
-            document.getElementById('modalTitle').innerText = "정보를 불러올 수 없습니다.";
-        });
+        .catch(err => console.error("영화 상세 오류:", err));
+
+    // 🔥 댓글 로드 추가
+    loadComments(movie.id);
 }
 
-// 7️⃣ 모달 닫기
+
+/** -------------------------------------------
+ *  7. 모달 닫기
+ --------------------------------------------*/
 function closeModal() {
     document.getElementById('movieModal').style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
-// 8️⃣ 추천 영화 렌더링
+
+/** -------------------------------------------
+ *  8. 추천 영화 렌더링
+ --------------------------------------------*/
 function renderRecommends(movies) {
     const container = document.getElementById('recommendContainer');
     container.innerHTML = '';
+
     if (!movies || movies.length === 0) {
         container.innerHTML = '<p class="no-data-msg">비슷한 작품 정보가 없습니다.</p>';
         return;
     }
 
     movies.slice(0, 4).forEach(movie => {
-        const posterSrc = movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : "https://placehold.co/200x300/000000/ffffff?text=No+Poster";
+        const posterSrc = movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : NO_POSTER_URL;
+
         const card = document.createElement('div');
         card.className = 'recommend-card';
         card.onclick = () => openModal(movie);
-        card.innerHTML = `<img src="${posterSrc}"><p>${movie.title}</p>`;
+
+        card.innerHTML = `
+            <img src="${posterSrc}">
+            <p>${movie.title}</p>
+        `;
+
         container.appendChild(card);
     });
 }
 
-// 9️⃣ 찜하기
+
+/** -------------------------------------------
+ *  9. 찜하기
+ --------------------------------------------*/
 async function toggleLike() {
     if (!currentMovie) return;
 
     try {
         const res = await fetch('/favorite/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({
                 movieId: currentMovie.id,
                 title: currentMovie.title,
@@ -330,27 +210,220 @@ async function toggleLike() {
             return;
         }
 
-        if (!res.ok) throw new Error("찜 추가 실패");
-
         alert(`${currentMovie.title} 영화가 찜 목록에 추가되었습니다!`);
+
     } catch (err) {
         console.error(err);
-        alert("찜 추가 중 오류가 발생했습니다.");
+        alert("찜 추가 오류 발생");
     }
 }
 
-
-// 모달 찜 버튼 연결
 document.querySelector('.btn-like').onclick = toggleLike;
 
-// 모달 외부 클릭 시 닫기
-window.onclick = function(e) {
-    if (e.target == document.getElementById('movieModal')) closeModal();
+
+
+
+/* -------------------------------------------
+   🔥 로그인 사용자 이메일 불러오기
+--------------------------------------------*/
+
+let currentUserEmail = null;
+
+async function loadCurrentUser() {
+    try {
+        const res = await fetch("/user/me", { credentials: "include" });
+
+        if (res.status === 200) {
+            const user = await res.json();
+            currentUserEmail = user.email;   // 🔥 UserDto.email
+        } else {
+            currentUserEmail = null;
+        }
+    } catch (e) {
+        currentUserEmail = null;
+    }
 }
 
-// 엔터키 검색
-document.getElementById('searchInput').addEventListener("keypress", function(event) {
-    if (event.key === "Enter") searchMovies();
-});
+loadCurrentUser(); // 실행!!
 
 
+
+
+
+/* -------------------------------------------
+   🔥 댓글 기능
+--------------------------------------------*/
+
+/** 댓글 불러오기 */
+function loadComments(movieId) {
+    console.log("댓글 로딩 시작: Movie ID =", movieId);
+
+    fetch(`/comments/${movieId}`, {
+        method: "GET",
+        credentials: "include"
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("댓글 조회 실패");
+        return res.json();
+    })
+    .then(data => {
+        console.log("서버 응답 데이터:", data); // 🔥 브라우저 콘솔(F12)에서 이 로그를 꼭 확인하세요!
+        renderComments(data);
+    })
+    .catch(err => console.error("댓글 로드 중 에러:", err));
+}
+
+/** 댓글 렌더링 */
+function renderComments(comments) {
+    const container = document.getElementById("commentList");
+    container.innerHTML = "";
+
+    // 1. 데이터가 없거나 빈 배열일 경우
+    if (!comments || comments.length === 0) {
+        container.innerHTML = "<p style='color:#777; padding:10px;'>아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!</p>";
+        return;
+    }
+
+    // 2. 댓글 목록 반복 렌더링
+    comments.forEach(c => {
+        // 🔥 필드명 안전 처리 (DTO 필드명이 id인지 commentId인지 몰라도 동작하게 함)
+        // 서버 DTO가 { id: 1, email: "a@a.com" } 형태일 수도 있고
+        // { commentId: 1, userEmail: "a@a.com" } 형태일 수도 있음
+        const id = c.commentId || c.id; 
+        const email = c.userEmail || c.email || c.nickname; 
+        const content = c.content;
+        const date = c.createdAt || c.createdDate || "";
+
+        // 현재 로그인한 사용자가 작성자인지 확인
+        const isOwner = currentUserEmail && (currentUserEmail === email);
+
+        const item = document.createElement("div");
+        item.className = "comment-item";
+
+        item.innerHTML = `
+            <div class="meta">
+                <span style="color:#fff; font-weight:bold;">${email}</span> 
+                <span style="color:#666; font-size:11px; margin-left:8px;">${formatDate(date)}</span>
+            </div>
+            <div class="content" style="color:#ddd; margin-top:4px; white-space: pre-wrap;">${content}</div>
+
+            <div class="comment-actions" style="margin-top:8px; text-align:right;">
+                ${isOwner ? `
+                    <button onclick="editComment(${id}, '${content.replace(/'/g, "\\'")}')" style="background:#444; color:#fff; border:none; border-radius:4px; padding:4px 8px;">수정</button>
+                    <button onclick="deleteComment(${id})" style="background:#c00; color:#fff; border:none; border-radius:4px; padding:4px 8px;">삭제</button>
+                ` : ``}
+            </div>
+        `;
+
+        container.appendChild(item);
+    });
+}
+
+/** 날짜 포맷팅 함수 (배열[2024,12,11...] 또는 문자열 처리) */
+function formatDate(dateData) {
+    if (!dateData) return "";
+    
+    // 만약 Java LocalDateTime이 배열로 넘어올 경우 [2024, 5, 20, 14, 30, 0]
+    if (Array.isArray(dateData)) {
+        return `${dateData[0]}-${String(dateData[1]).padStart(2,'0')}-${String(dateData[2]).padStart(2,'0')} ` +
+               `${String(dateData[3]).padStart(2,'0')}:${String(dateData[4]).padStart(2,'0')}`;
+    }
+    // 문자열일 경우 (2024-05-20T14:30:00)
+    return new Date(dateData).toLocaleString();
+}
+
+/** 댓글 등록 */
+document.getElementById("commentSubmitBtn").onclick = async function () {
+    const input = document.getElementById("commentInput");
+    const text = input.value.trim();
+    
+    if (!text) return alert("댓글 내용을 입력하세요!");
+    if (!currentMovie) return alert("영화 정보가 로드되지 않았습니다.");
+
+    try {
+        const res = await fetch('/comments', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                movieId: currentMovie.id,
+                content: text
+            })
+        });
+
+        if (res.status === 401) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+        
+        if (!res.ok) throw new Error("댓글 등록 실패");
+
+        // 성공 시 입력창 비우고 목록 갱신
+        input.value = "";
+        loadComments(currentMovie.id);
+
+    } catch (err) {
+        console.error(err);
+        alert("댓글 등록 중 오류가 발생했습니다.");
+    }
+};
+
+/** 댓글 삭제 */
+async function deleteComment(id) {
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+    try {
+        const res = await fetch(`/comments/${id}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+
+        if (!res.ok) throw new Error("삭제 실패");
+
+        loadComments(currentMovie.id);
+
+    } catch (err) {
+        console.error(err);
+        alert("댓글 삭제 오류");
+    }
+}
+
+/** 댓글 수정 */
+function editComment(id, oldContent) {
+    const newText = prompt("새 댓글 내용을 입력하세요.", oldContent);
+    if (!newText) return;
+
+    fetch(`/comments/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newText)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("수정 실패");
+            loadComments(currentMovie.id);
+        })
+        .catch(err => {
+            console.error(err);
+            alert("댓글 수정 오류");
+        });
+}
+
+
+
+
+
+
+
+/** -------------------------------------------
+ *  기타 (모달 외부 클릭 / Enter 검색)
+ --------------------------------------------*/
+window.onclick = function (e) {
+    if (e.target == document.getElementById('movieModal')) closeModal();
+};
+
+document
+    .getElementById('searchInput')
+    .addEventListener("keypress", event => {
+        if (event.key === "Enter") searchMovies();
+    });

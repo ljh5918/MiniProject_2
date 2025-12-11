@@ -52,7 +52,7 @@ public class UserController {
 
 	          result.put("status", "success");
 	          result.put("message", "로그인 성공");
-	          result.put("redirect", "/");   // 🔥 메인 페이지로 이동시키기
+	          result.put("redirect", "/");  
 
 	          return ResponseEntity.ok()
 	                  .header(HttpHeaders.SET_COOKIE, cookie.toString())
