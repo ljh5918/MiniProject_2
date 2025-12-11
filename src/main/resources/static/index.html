@@ -35,8 +35,13 @@
             <a href="/register.html"><button class="btn-signup">회원가입</button></a>
         </div>
 
+<<<<<<< HEAD
         <div id="userNav" style="display:none;">
             <span id="welcomeMsg">환영합니다!</span>
+=======
+        <div id="userNav" style="display: none;">
+            <span id="welcomeMsg">환영합니다, <span id="userName">User</span>님!</span>
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
             <button class="btn-mypage" onclick="location.href='/mypage.html'">⭐ my</button>
             <button class="btn-logout" onclick="logout()">로그아웃</button>
         </div>
@@ -44,8 +49,13 @@
 </header>
 
 <main>
+<<<<<<< HEAD
     <section id="personalSection" style="display:none;">
         <h2>✨ <span id="userName">User</span>님 취향 저격 영화</h2>
+=======
+    <section id="personalSection" style="display: none;">
+        <h2>✨ 회원님을 위한 취향 저격 영화</h2>
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
         <div id="personalContainer" class="movie-grid"></div>
         <hr class="divider" />
     </section>
@@ -54,8 +64,12 @@
     <div id="movieContainer" class="movie-grid"></div>
 </main>
 
+<<<<<<< HEAD
 <!-- 모달 -->
 <div id="movieModal" class="modal" style="display:none;">
+=======
+<div id="movieModal" class="modal">
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
 
@@ -64,8 +78,13 @@
                 <img id="modalPoster" src="" alt="포스터" style="width:100%; height:100%; object-fit:cover;" />
             </div>
 
+<<<<<<< HEAD
             <div class="modal-right" style="width:60%;">
                 <div class="modal-header-info" style="display:flex; justify-content:space-between; align-items:flex-start;">
+=======
+            <div class="modal-right">
+                <div class="modal-header-info">
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
                     <h2 id="modalTitle">영화 제목</h2>
                     <div>
                         <button id="modalLikeBtn" class="btn-like">❤ 찜하기</button>
@@ -81,6 +100,7 @@
                     <h3>💡 이 영화와 비슷한 작품</h3>
                     <div id="recommendContainer" class="recommend-grid"></div>
                 </div>
+<<<<<<< HEAD
 
                 <!-- 댓글 섹션 -->
                 <div class="comment-section">
@@ -93,11 +113,14 @@
 
                     <div id="commentList" style="margin-top:12px;"></div>
                 </div>
+=======
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
             </div>
         </div>
     </div>
 </div>
 
+<<<<<<< HEAD
 
 
 
@@ -169,6 +192,9 @@
         location.reload();
     }
  </script> 
+=======
+<script src="/js/app.js"></script>
+
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
 </body>
 </html>
-

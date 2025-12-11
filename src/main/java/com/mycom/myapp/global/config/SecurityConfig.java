@@ -182,6 +182,7 @@ public class SecurityConfig {
                     "/user/login", "/user/register"
                 ).permitAll()
 
+<<<<<<< HEAD
                 // 댓글 조회(GET)은 공개 허용 (누구나 볼 수 있게)
                 .requestMatchers(HttpMethod.GET, "/comments/**").permitAll()
 
@@ -199,6 +200,31 @@ public class SecurityConfig {
 
             // JWT 필터 등록
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+=======
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                        		"/",
+                        		"/index.html", 
+                        		"/register.html",
+                        		"/login.html",
+                        		"/movies/**",
+                        		"/css/**", "/js/**", "/img/**",
+                        		"/favorite/**",
+                        		"/mypage/**",
+                        		"/mypage.html",
+                        		"/user/**"
+                        		).permitAll()  // 회원가입/로그인 모두 허용
+                        .anyRequest().authenticated()             
+                )
+                .formLogin(login -> login.disable()) 
+                .httpBasic(basic -> basic.disable())
+                
+                // JWT 필터를 인증 필터 이전에 등록
+                .addFilterBefore(
+                    new JwtAuthenticationFilter(jwtTokenProvider), 
+                    UsernamePasswordAuthenticationFilter.class
+                ); 
+>>>>>>> 04d81efdf9ec1268bd3ca56434d5c8a75b578ede
 
         return http.build();
     }
