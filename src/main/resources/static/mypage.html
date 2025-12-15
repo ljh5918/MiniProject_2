@@ -10,10 +10,10 @@
 <header>
     <div class="logo" onclick="location.href='/'">🎬 MovieSense</div>
     <div class="auth-buttons">
-        <div id="guestNav" style="display: none;">
+        <div id="guestNav" style="display:none;">
             <a href="/login.html"><button>로그인</button></a>
         </div>
-        <div id="userNav" style="display: none;">
+        <div id="userNav" style="display:none;">
             <span id="welcomeMsg"></span>
             <button onclick="logout()">로그아웃</button>
         </div>
@@ -21,116 +21,47 @@
 </header>
 
 <main>
-    <h2>⭐ 내가 찜한 영화</h2>
-    <div id="favoritesContainer" class="movie-grid"></div>
+
+<section class="profile-box">
+    <h2>👤 프로필 관리</h2>
+
+    <div class="profile-row">
+        <label>이메일</label>
+        <input type="text" id="emailInput" readonly>
+    </div>
+
+    <div class="profile-row inline">
+        <div>
+            <label>닉네임</label>
+            <input type="text" id="nicknameInput">
+        </div>
+        <button class="btn-primary" onclick="updateNickname()">수정</button>
+    </div>
+
+	<div class="profile-row inline narrow">
+	    <div>
+	        <label>현재 비밀번호</label>
+	        <input type="password" id="currentPw">
+	    </div>
+	</div>
+
+
+    <div class="profile-row inline">
+        <div>
+            <label>새 비밀번호</label>
+            <input type="password" id="newPw">
+        </div>
+        <button class="btn-primary" onclick="updatePassword()">변경</button>
+    </div>
+</section>
+
+
+<h2>⭐ 내가 찜한 영화</h2>
+<div id="favoritesContainer" class="movie-grid"></div>
+
 </main>
 
-<script>
-const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-const NO_POSTER_URL = "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
-
-// 페이지 로드 시
-window.onload = function() {
-    checkLoginStatus();
-};
-
-// 로그인 상태 확인 후 UI 적용
-async function checkLoginStatus() {
-    try {
-        const res = await fetch("/user/me", { method: "GET", credentials: "include" });
-        if (!res.ok) {
-            alert("로그인이 필요합니다.");
-            location.href = "/login.html";
-            return;
-        }
-        const user = await res.json();
-        document.getElementById("userNav").style.display = "block";
-        document.getElementById("welcomeMsg").innerText = `${user.nickname || user.email}님, 안녕하세요!`;
-
-        loadFavorites(); // 찜한 영화 가져오기
-    } catch (err) {
-        console.error(err);
-        alert("로그인 정보를 불러올 수 없습니다.");
-        location.href = "/login.html";
-    }
-}
-
-// 찜한 영화 가져오기
-async function loadFavorites() {
-    try {
-        const res = await fetch("/favorite/list", { method: "GET", credentials: "include" });
-        if (!res.ok) throw new Error("찜한 영화 불러오기 실패");
-        const movies = await res.json();
-        renderFavorites(movies);
-    } catch (err) {
-        console.error(err);
-        document.getElementById('favoritesContainer').innerHTML = '<p>찜한 영화 정보를 불러올 수 없습니다.</p>';
-    }
-}
-
-// 찜한 영화 렌더링 + 삭제 버튼
-function renderFavorites(movies) {
-    const container = document.getElementById('favoritesContainer');
-    container.innerHTML = '';
-
-    if (!movies || movies.length === 0) {
-        container.innerHTML = '<p>찜한 영화가 없습니다.</p>';
-        return;
-    }
-
-    movies.forEach(movie => {
-        const posterSrc = movie.posterPath ? IMAGE_BASE_URL + movie.posterPath : NO_POSTER_URL;
-
-        const card = document.createElement('div');
-        card.className = 'movie-card';
-        card.innerHTML = `
-            <img src="${posterSrc}" alt="${movie.title}">
-            <h3>${movie.title}</h3>
-        `;
-
-        // 삭제 버튼
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '삭제';
-        deleteBtn.className = 'btn-delete';
-        deleteBtn.onclick = () => deleteFavorite(movie.movieId, card);
-
-        card.appendChild(deleteBtn);
-        container.appendChild(card);
-    });
-}
-
-// 찜한 영화 삭제
-async function deleteFavorite(movieId, cardElement) {
-    try {
-        const res = await fetch('/favorite/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ movieId })
-        });
-
-        if (!res.ok) {
-            if(res.status === 401) alert("로그인이 필요합니다.");
-            else if(res.status === 403) alert("권한이 없습니다.");
-            else alert("삭제 실패");
-            return;
-        }
-
-        cardElement.remove();
-        alert("찜 목록에서 삭제되었습니다.");
-    } catch (err) {
-        console.error(err);
-        alert("삭제 중 오류가 발생했습니다.");
-    }
-}
-
-// 로그아웃
-async function logout() {
-    await fetch("/user/logout", { method: "POST", credentials: "include" });
-    alert("로그아웃 완료");
-    location.href = "/login.html";
-}
-</script>
-
+<!-- ✅ 마이페이지 전용 JS -->
+<script src="/js/mypage.js"></script>
 </body>
 </html>

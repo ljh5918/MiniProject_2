@@ -26,4 +26,16 @@ public class User {
 
     @Column(nullable = false, length = 20)
     private String role;
+    
+    
+    
+    
+    // 닉네임, 비밀번호 수정 메서드
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
