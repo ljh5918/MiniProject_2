@@ -31,8 +31,12 @@ public class MovieController {
 
     // 2. 검색 (GET /movies/search?q=...) - API 직접 호출
     @GetMapping("/search")
-    public ResponseEntity<List<TmdbMovieDto>> searchMovies(@RequestParam("q") String query) {
-        return ResponseEntity.ok(movieService.searchMovies(query));
+    public ResponseEntity<List<TmdbMovieDto>> searchMovies(
+            @RequestParam("q") String query,
+            @RequestParam(value = "useApi", defaultValue = "true") boolean useApi // ⭐ 추가
+    ) {
+        // 서비스에 useApi 값 전달
+        return ResponseEntity.ok(movieService.searchMovies(query, useApi));
     }
 
     // 3. 상세 조회 (GET /movies/detail/{id}) - API 직접 호출
@@ -51,5 +55,12 @@ public class MovieController {
     public ResponseEntity<Page<TmdbMovieDto>> getAllMovies(
             @RequestParam(value = "page", defaultValue = "1") int page) {
         return ResponseEntity.ok(movieService.getAllMovies(page));
+    }
+    
+    //db에 저장된 영화 갯수 리턴
+    @GetMapping("/count")	
+    public ResponseEntity<Long> getMoviesCount() {
+    	return ResponseEntity.ok(movieService.getMovieCount());
+    	
     }
 }

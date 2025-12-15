@@ -9,23 +9,40 @@
 <body>
 
 <header>
-    <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
-
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="영화 제목 검색..." />
-        <button onclick="searchMovies()">🔍</button>
+    <div class="header-left">
+        <div class="logo" onclick="location.reload()">🎬 MovieSense</div>
     </div>
 
-    <div class="auth-buttons">
-        <div id="guestNav">
-            <a href="/login.html"><button class="btn-login">로그인</button></a>
-            <a href="/register.html"><button class="btn-signup">회원가입</button></a>
+    <div class="header-center">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="영화 제목 검색 (예: 아이언맨)..." onkeypress="handleEnter(event)">
+            <button onclick="searchMovies()">🔍</button>
+        </div>
+        
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="apiModeToggle" checked>
+                <span class="slider round"></span>
+            </label>
+            <span id="toggleLabel">API 모드</span>
         </div>
 
-        <div id="userNav" style="display: none;">
-            <span id="welcomeMsg">환영합니다, <span id="userName">User</span>님!</span>
-            <button class="btn-mypage" onclick="location.href='/mypage.html'">⭐ my</button>
-            <button class="btn-logout" onclick="logout()">로그아웃</button>
+        <span id="dbCountBadge" onclick="location.href='/savedmovies.html'">
+            💾 0개
+        </span>
+    </div>
+
+    <div class="header-right">
+        <div class="auth-buttons">
+            <div id="guestNav">
+                <button class="btn-login" onclick="location.href='/login.html'">로그인</button>
+                <button class="btn-signup" onclick="location.href='/register.html'">회원가입</button>
+            </div>
+            <div id="userNav" style="display: none;">
+                <span id="welcomeMsg">반가워요, <span id="userName">User</span>님!</span>
+                <button class="btn-mypage" onclick="location.href='/mypage.html'">MY</button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
         </div>
     </div>
 </header>
