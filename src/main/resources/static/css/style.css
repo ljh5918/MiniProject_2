@@ -242,3 +242,91 @@ section h2 { font-size: 22px; margin-bottom: 15px; color: #fff; font-weight: 700
     border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
     font-size: 13px;
 }
+
+
+
+
+
+/* =========================
+   프로필 관리 카드
+========================= */
+.profile-box {
+    background: linear-gradient(145deg, #1a1a1a, #111);
+    border-radius: 14px;
+    padding: 24px 28px;
+    width: 420px;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.profile-box h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #fff;
+}
+
+/* 행 기본 */
+.profile-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    gap: 6px;
+}
+
+.profile-row label {
+    font-size: 13px;
+    color: #bbb;
+}
+
+/* input 스타일 */
+.profile-row input {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.profile-row input:focus {
+    outline: none;
+    border-color: #ff2f2f;
+    box-shadow: 0 0 0 1px rgba(255,47,47,0.4);
+}
+
+/* readonly */
+.profile-row input[readonly] {
+    background: #181818;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* 버튼 + input 나란히 */
+.profile-row.inline {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.profile-row.inline > div {
+    flex: 1;
+}
+
+/* 버튼 */
+.btn-primary {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: none;
+    background: #ff2f2f;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #ff4a4a;
+    transform: translateY(-1px);
+}
+
