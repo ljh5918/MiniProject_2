@@ -28,11 +28,11 @@ public class MovieService {
 
     private boolean useApi = true;
 
-    // 1. 검색 
+ // 1. 검색 (API 모드 / DB 모드 분기 처리)
     @Transactional
-    public List<TmdbMovieDto> searchMovies(String query) {
-        
-        // 1. API호출 후 DB에 없는 영화 데이터 채우기 
+    public List<TmdbMovieDto> searchMovies(String query, boolean useApi) { // ⭐ 파라미터 추가
+
+        // ⭐ useApi가 true일 때만 "수집(API 호출 + 저장)" 실행
         if (useApi) {
             List<TmdbMovieDto> apiResults = tmdbApiClient.searchMovies(query);
             for (TmdbMovieDto dto : apiResults) {
@@ -47,6 +47,7 @@ public class MovieService {
             }
         }
 
+        // ⭐ DB 조회는 모드 상관없이 무조건 실행 (결과 반환용)
         List<Movie> entities = movieRepository.findByTitleContaining(query);
         
         return entities.stream().map(entity -> {
@@ -104,6 +105,9 @@ public class MovieService {
     // 추천영화 api
     public List<TmdbMovieDto> getRecommendations(Long tmdbId) {
         return tmdbApiClient.getRecommendations(tmdbId);
+    }
+    public Long getMovieCount() {
+        return movieRepository.count(); 
     }
     
 }
