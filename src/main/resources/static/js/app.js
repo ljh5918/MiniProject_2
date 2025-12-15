@@ -15,9 +15,18 @@ let currentUserEmail = null;
    ========================================= */
 window.onload = function() {
     checkLoginStatus();
-    // 3번 섹션(인기 영화) 무조건 로드
+    updateMovieCount();
     fetchAndRenderMovies('/movies/popular', 'popularContainer', 'GRID');
 };
+
+function updateMovieCount() {
+    fetch('/movies/count')
+        .then(res => res.json())
+        .then(count => {
+            document.getElementById('dbCountBadge').innerText = `💾 ${count}개 저장됨`;
+        })
+        .catch(err => console.error("개수 로드 실패", err));
+}
 
 /* =========================================
    3. 인증 및 추천 로직 (복구됨)
@@ -154,7 +163,7 @@ async function loadDualRecommendations(userName) {
 function fetchAndRenderMovies(url, containerId, type = 'GRID') {
     fetch(url)
         .then(res => res.json())
-        .then(data => renderMovies(data, containerId, type))
+        .then(data => {renderMovies(data, containerId, type); updateMovieCount();})
         .catch(err => console.error(err));
 }
 
@@ -189,8 +198,23 @@ function searchMovies() {
     const query = document.getElementById('searchInput').value;
     if (!query) return alert("검색어 입력!");
     
-    document.getElementById('sectionTitle').innerText = `'${query}' 검색 결과`;
-    fetchAndRenderMovies(`/movies/search?q=${query}`, 'popularContainer', 'GRID');
+    // 1. 토글 상태 확인
+    const useApi = document.getElementById('apiModeToggle').checked;
+    
+    // 2. 제목 업데이트
+    const modeLabel = useApi ? "[API 수집]" : "[DB 검색]";
+    document.getElementById('sectionTitle').innerText = `${modeLabel} '${query}' 검색 결과`;
+
+    // ⭐ [핵심 추가] 검색 시 다른 섹션(추천, 찜 등)은 숨기기!
+    const rec1 = document.getElementById('recommendSection1');
+    const rec2 = document.getElementById('recommendSection2');
+    
+    // 섹션이 존재하면 안 보이게 설정 (display: none)
+    if(rec1) rec1.style.display = 'none';
+    if(rec2) rec2.style.display = 'none';
+
+    // 3. 백엔드 요청
+    fetchAndRenderMovies(`/movies/search?q=${query}&useApi=${useApi}`, 'popularContainer', 'GRID');
 }
 
 /* =========================================
@@ -217,7 +241,37 @@ function openModal(movieId) {
         .then(movie => {
             currentMovieData = movie;
             document.getElementById('modalTitle').innerText = movie.title;
-            document.getElementById('modalOverview').innerText = movie.overview || "내용 없음";
+            document.getElementById('modalOverview').innerText = movie.overview || "줄거리가 제공되지 않았습니다.";
+			
+			// 1. 요소 가져오기 (변수 선언 필수!)
+			const overviewEl = document.getElementById('modalOverview');
+
+			// 2. 줄거리 데이터 확인 및 분기 처리
+			if (movie.overview && movie.overview.trim() !== "") {
+			    // [CASE 1] 줄거리가 있을 때
+			    overviewEl.innerText = movie.overview;
+			    
+			    // 스타일: 일반 텍스트 모드
+			    overviewEl.style.display = 'block';
+			    overviewEl.style.textAlign = 'left';
+			    overviewEl.style.color = '#bbb';
+			    overviewEl.style.height = 'auto'; // 높이 자동 조절
+			    overviewEl.style.justifyContent = ''; // flex 속성 초기화
+			    overviewEl.style.alignItems = '';
+			} else {
+			    // [CASE 2] 줄거리가 없을 때
+			    overviewEl.innerText = "줄거리가 제공되지 않았습니다.";
+			    
+			    // 스타일: 박스 정중앙 배치 모드 (Flexbox)
+			    overviewEl.style.display = 'flex';
+			    overviewEl.style.justifyContent = 'center'; // 가로 중앙
+			    overviewEl.style.alignItems = 'center';     // 세로 중앙
+			    overviewEl.style.height = '70%';           // 부모 높이만큼 꽉 채움
+			    overviewEl.style.minHeight = '70px';       // 최소 높이 확보 (너무 납작해지지 않게)
+			    overviewEl.style.color = '#777';            // 흐린 글씨
+			    overviewEl.style.textAlign = 'center';
+			}
+			
             document.getElementById('modalPoster').src = getPosterUrl(movie.posterPath || movie.poster_path);
             
             if (isUserLoggedIn) checkIfFavorite(movieId);
