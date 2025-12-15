@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>수집된 영화 아카이브</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        /* 페이징 버튼용 간단 스타일 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .page-btn {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .page-btn:disabled {
+            background-color: #222;
+            color: #555;
+            cursor: not-allowed;
+        }
+        .page-info {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .back-link {
+            display: block;
+            margin: 20px;
+            color: #e50914;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="back-link">← 메인으로 돌아가기</a>
+
+    <h1 style="text-align: center;">💾 MovieSense Archive</h1>
+    <p style="text-align: center; color: #ccc;">현재 DB에 저장된 모든 영화를 확인하는 페이지입니다.</p>
+
+    <div id="archiveContainer" class="movie-grid" style="padding: 20px;"></div>
+
+    <div class="pagination">
+        <button id="prevBtn" class="page-btn" onclick="changePage(-1)">이전</button>
+        <span id="pageInfo" class="page-info">Page 1 / 1</span>
+        <button id="nextBtn" class="page-btn" onclick="changePage(1)">다음</button>
+    </div>
+
+    <script>
+    /* =========================================
+    전역 변수
+    ========================================= */
+ const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+ const NO_POSTER_URL = "https://placehold.co/300x450/000000/ffffff?text=No+Poster";
+
+ let currentPage = 1;
+ let totalPages = 1;
+
+ /* =========================================
+    초기화
+    ========================================= */
+ window.onload = function() {
+     fetchMovies(1); // 1페이지 로드 시작
+ };
+
+ /* =========================================
+    데이터 로드 (페이징)
+    ========================================= */
+ function fetchMovies(page) {
+     // 백엔드 API 호출
+     fetch(`/movies/list?page=${page}`)
+         .then(res => res.json())
+         .then(data => {
+             // Spring Page 객체 구조: { content: [...], totalPages: 5, ... }
+             renderMovies(data.content);
+             updatePagination(data);
+         })
+         .catch(err => {
+             console.error("로딩 실패:", err);
+             document.getElementById('archiveContainer').innerHTML = "<p style='text-align:center;'>데이터를 불러오지 못했습니다.</p>";
+         });
+ }
+
+ /* =========================================
+    렌더링
+    ========================================= */
+ function renderMovies(movies) {
+     const container = document.getElementById('archiveContainer');
+     container.innerHTML = ''; // 초기화
+
+     if (!movies || movies.length === 0) {
+         container.innerHTML = "<p style='text-align:center; width:100%;'>저장된 영화가 없습니다.</p>";
+         return;
+     }
+
+     movies.forEach(movie => {
+         const posterSrc = movie.poster_path 
+             ? IMAGE_BASE_URL + movie.poster_path 
+             : NO_POSTER_URL;
+
+         const card = document.createElement('div');
+         card.className = 'movie-card'; 
+         // 클릭 시 경고창 띄우거나, 필요하면 메인 페이지 상세로 이동하게 구현 가능
+         card.onclick = () => alert(`영화 ID: ${movie.id}\n제목: ${movie.title}\n(상세보기는 메인에서 가능합니다)`);
+         
+         card.innerHTML = `
+             <img src="${posterSrc}" alt="${movie.title}">
+             <h3>${movie.title}</h3>
+             <p style="font-size:0.8rem; color:#aaa;">ID: ${movie.id}</p>
+         `;
+         container.appendChild(card);
+     });
+ }
+
+ /* =========================================
+    페이지네이션 UI 업데이트
+    ========================================= */
+ function updatePagination(data) {
+     currentPage = data.number + 1; // Spring은 0부터 시작하므로 +1
+     totalPages = data.totalPages;
+
+     const pageInfo = document.getElementById('pageInfo');
+     const prevBtn = document.getElementById('prevBtn');
+     const nextBtn = document.getElementById('nextBtn');
+
+     // 텍스트 업데이트
+     pageInfo.innerText = `Page ${currentPage} / ${totalPages === 0 ? 1 : totalPages}`;
+
+     // 버튼 활성화/비활성화
+     prevBtn.disabled = data.first; // 첫 페이지면 '이전' 불가
+     nextBtn.disabled = data.last;  // 마지막 페이지면 '다음' 불가
+ }
+
+ /* =========================================
+    페이지 변경 이벤트
+    ========================================= */
+ function changePage(delta) {
+     const newPage = currentPage + delta;
+     if (newPage > 0 && newPage <= totalPages) {
+         fetchMovies(newPage);
+         // 스크롤 맨 위로 이동
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+     }
+ }</script>
+</body>
+</html>

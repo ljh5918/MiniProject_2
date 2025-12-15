@@ -41,6 +41,7 @@ public class SecurityConfig {
                     "/index.html",
                     "/register.html", 
                     "/login.html",
+                    "/savedmovies.html", 
                     "/css/**", "/js/**", "/img/**",
                     "/test/**"
                 ).permitAll()
