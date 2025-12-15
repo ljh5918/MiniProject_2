@@ -16,7 +16,9 @@ public class TmdbMovieDto {
 
     @JsonProperty("overview")
     private String overview;
-
+    
+    //영화 예고편 추가
+    private String videoKey;
     // ▼ [추가된 부분] 필터링을 위해 필요한 정보
     @JsonProperty("original_title")
     private String originalTitle;    // 원제 (예: Iron Man)
