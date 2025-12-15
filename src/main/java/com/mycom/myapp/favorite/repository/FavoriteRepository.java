@@ -19,4 +19,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findByUserWithMovie(@Param("user") User user);
 
     Optional<Favorite> findByUserAndMovie(User user, Movie movie);  // 삭제용
+    
+    
+    // test 코드 위한 메서드 추가
+    boolean existsByUser_EmailAndMovie_MovieId(String email, Long movieId);
+
 }

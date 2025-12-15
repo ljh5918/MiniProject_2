@@ -1,251 +1,126 @@
 package com.mycom.myapp.test;
 
-import com.mycom.myapp.global.jwt.JwtTokenProvider;
 import com.mycom.myapp.user.dto.UserDto;
 import com.mycom.myapp.user.dto.UserLoginDto;
-import com.mycom.myapp.user.dto.UserResultDto;
-import com.mycom.myapp.user.entity.User;
 import com.mycom.myapp.user.repository.UserRepository;
-import com.mycom.myapp.user.service.UserServiceImpl;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.mycom.myapp.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
+@SpringBootTest
 class UserServiceImplTest {
 
-    @Mock
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepository userRepository;
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
-    @Mock
-    private AuthenticationManager authenticationManager;
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
-
-    @InjectMocks
-    private UserServiceImpl userService;
-
-    @BeforeEach
-    void init() {
-        MockitoAnnotations.openMocks(this);
-        when(authenticationManagerBuilder.getObject()).thenReturn(authenticationManager);
-    }
-
-    @Test
-    void registerTest() {
-        UserDto input = UserDto.builder()
-                .email("test@test.com")
-                .password("1234")
-                .nickname("tester")
-                .build();
-
-        User saved = User.builder()
-                .userId(1L)
-                .email("test@test.com")
-                .nickname("tester")
-                .password("encoded")
-                .role("ROLE_USER")
-                .build();
-
-        when(passwordEncoder.encode(any())).thenReturn("encoded");
-        when(userRepository.save(any())).thenReturn(saved);
-
-        UserResultDto result = userService.register(input);
-
-        assertEquals("test@test.com", result.getEmail());
-        assertEquals("tester", result.getNickname());
-    }
-
-//    @Test
-//    void loginTest() {
-//        UserLoginDto loginDto = new UserLoginDto("test@test.com", "1234");
-//
-//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-//                .thenReturn(authentication);
-//
-//        when(jwtTokenProvider.createAccessToken(any())).thenReturn("dummyToken");
-//
-//        String token = userService.login(loginDto);
-//
-//        assertEquals("dummyToken", token);
-//    }
     
+    
+    @Test
+    @DisplayName("실 DB 기준: 존재하지 않는 이메일이면 회원가입 성공")
+    void register_success_when_email_not_exists_in_real_db() {
+
+        // ⚠️ DB에 없는 이메일을 써야 함 (중요)
+        String email = "test100@test.com";
+        String password = "1234";
+        String nickname = "test100";
+
+        // 사전 확인: DB에 없어야 함
+        assertThat(userRepository.findByEmail(email)).isEmpty();
+
+        UserDto userDto = UserDto.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .build();
+
+        // when
+        userService.register(userDto);
+
+        // then: DB에 실제로 저장되었는지 확인
+        assertThat(userRepository.findByEmail(email)).isPresent();
+    }
+
+    
+    
+    
+    @Test
+    @DisplayName("실 DB 기준: 이미 존재하는 이메일이면 회원가입 실패")
+    void register_fail_when_email_already_exists_in_real_db() {
+
+        // ⚠️ 반드시 실 DB에 이미 존재하는 이메일
+        String email = "asd@asd.com";
+
+        assertThat(userRepository.findByEmail(email)).isPresent();
+
+        UserDto userDto = UserDto.builder()
+                .email(email)
+                .password("anyPassword")
+                .nickname("DupUser")
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> userService.register(userDto))
+                .isInstanceOf(Exception.class); 
+                // 보통 DataIntegrityViolationException
+    }
 
     
     
     @Test
-    @DisplayName("로그인 성공 테스트")
-    void loginTest() {
-        UserLoginDto loginDto = new UserLoginDto("test@test.com", "1234");
+    @DisplayName("실 DB에 존재하는 회원이면 로그인 성공")
+    void login_success_when_user_exists_in_real_db() {
 
-        // ⭐ DB에 해당 유저가 존재하는 것처럼 설정
-        User user = User.builder()
-                .email("test@test.com")
-                .password("encodedPw") // 실제 검증은 AuthenticationManager가 수행
-                .nickname("tester")
-                .build();
+        // ⚠️ 반드시 실제 DB(users 테이블)에 존재하는 계정
+        String email = "asd@asd.com";
+        String password = "asd";
 
-        when(userRepository.findByEmail("test@test.com"))
-                .thenReturn(Optional.of(user));
+        // 안전 확인 (선택)
+        assertThat(userRepository.findByEmail(email)).isPresent();
 
-        // authenticationManager 동작 mock
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-
-        when(jwtTokenProvider.createAccessToken(any(Authentication.class)))
-                .thenReturn("dummyToken");
+        UserLoginDto loginDto = new UserLoginDto(email, password);
 
         String token = userService.login(loginDto);
 
-        assertEquals("dummyToken", token);
+        assertThat(token).isNotNull();
+        assertThat(token).isNotBlank();
     }
-    
 
     @Test
-    void getUserProfileTest() {
-        User user = User.builder()
-                .email("test@test.com")
-                .nickname("tester")
-                .password("1234")
-                .build();
+    @DisplayName("실 DB에 존재하지 않는 회원이면 로그인 실패")
+    void login_fail_when_user_not_exists_in_real_db() {
 
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
+        String email = "failemail@asd.com";
+        String password = "1234";
 
-        UserDto dto = userService.getUserProfile("test@test.com");
+        assertThat(userRepository.findByEmail(email)).isEmpty();
 
-        assertEquals("test@test.com", dto.getEmail());
-        assertEquals("tester", dto.getNickname());
+        UserLoginDto loginDto = new UserLoginDto(email, password);
+
+        assertThatThrownBy(() -> userService.login(loginDto))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    @DisplayName("실 DB에 회원은 있지만 비밀번호가 틀리면 로그인 실패")
+    void login_fail_when_password_is_wrong() {
+
+        // ⚠️ 실제 DB에 존재하는 이메일
+        String email = "asd@asd.com";
+        String wrongPassword = "failpw";
+
+        assertThat(userRepository.findByEmail(email)).isPresent();
+
+        UserLoginDto loginDto = new UserLoginDto(email, wrongPassword);
+
+        assertThatThrownBy(() -> userService.login(loginDto))
+                .isInstanceOf(BadCredentialsException.class);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//package com.mycom.myapp.test;
-//
-//
-//import com.mycom.myapp.user.dto.UserDto;
-//import com.mycom.myapp.user.dto.UserLoginDto;
-//import com.mycom.myapp.user.repository.UserRepository;
-//import com.mycom.myapp.user.service.UserService;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.security.authentication.BadCredentialsException;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.assertThatThrownBy;
-//
-//@SpringBootTest // 1. 실제 스프링 컨테이너를 로드합니다 (DB 연결 포함)
-//@Transactional  // 2. 테스트가 끝나면 데이터를 롤백하여 DB를 깨끗하게 유지합니다
-//class UserServiceImplTest {
-//
-//    @Autowired
-//    private UserService userService;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    @BeforeEach
-//    void setup() {
-//        // 테스트 시작 전 DB 초기화가 필요하다면 여기서 수행
-//        // userRepository.deleteAll(); 
-//    }
-//
-//    @Test
-//    @DisplayName("실제 DB 연동: 회원가입 후 로그인 성공 테스트")
-//    void registerAndLogin_success() {
-//        // 1. 회원가입 (실제 DB에 저장됨)
-//        UserDto joinDto = UserDto.builder()
-//                .email("real@test.com")
-//                .password("realPassword123")
-//                .nickname("RealUser")
-//                .build();
-//        
-//        userService.register(joinDto);
-//
-//        // 2. 로그인 시도
-//        UserLoginDto loginDto = new UserLoginDto("realnn@test.com", "realPassword123");
-//        String accessToken = userService.login(loginDto);
-//
-//        // 3. 검증
-//        assertThat(accessToken).isNotNull();
-//        System.out.println("발급된 토큰: " + accessToken);
-//    }
-//
-//    @Test
-//    @DisplayName("실제 DB 연동: 비밀번호 불일치 시 로그인 실패")
-//    void login_fail_wrong_password() {
-//        // 1. 회원가입
-//        UserDto joinDto = UserDto.builder()
-//                .email("fail@test.com")
-//                .password("correctPassword")
-//                .nickname("FailUser")
-//                .build();
-//        userService.register(joinDto);
-//
-//        // 2. 틀린 비밀번호로 로그인 시도
-//        UserLoginDto loginDto = new UserLoginDto("fail@test.com", "WRONG_PASSWORD");
-//
-//        // 3. 예외 발생 검증 (Spring Security 설정에 따라 BadCredentialsException 발생)
-//        assertThatThrownBy(() -> userService.login(loginDto))
-//                .isInstanceOf(BadCredentialsException.class);
-//    }
-//    
-//    @Test
-//    @DisplayName("실제 DB 연동: 존재하지 않는 이메일 로그인 실패")
-//    void login_fail_no_user() {
-//        // 가입하지 않은 데이터
-//        UserLoginDto loginDto = new UserLoginDto("ghost@test.com", "anyPassword");
-//
-//        assertThatThrownBy(() -> userService.login(loginDto))
-//                .isInstanceOf(BadCredentialsException.class); 
-//                // 혹은 InternalAuthenticationServiceException 등 설정에 따라 다를 수 있음
-//    }
-//}
-//
-//
