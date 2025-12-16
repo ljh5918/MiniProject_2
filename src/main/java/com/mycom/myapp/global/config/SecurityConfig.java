@@ -83,20 +83,37 @@ public class SecurityConfig {
     }
 
     // CORS 설정
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        return request -> {
+//            CorsConfiguration config = new CorsConfiguration();
+//            // 프론트엔드 주소 (예: Live Server 사용 시 5500, 리액트 사용 시 3000 등)
+//            config.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5500")); 
+//            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//            config.setAllowedHeaders(List.of("*"));
+//            config.setAllowCredentials(true); // 쿠키 인증 허용
+//            config.setMaxAge(3600L);
+//            return config;
+//        };
+//    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
-            // 프론트엔드 주소 (예: Live Server 사용 시 5500, 리액트 사용 시 3000 등)
-            config.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5500")); 
+            config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            ));
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             config.setAllowedHeaders(List.of("*"));
-            config.setAllowCredentials(true); // 쿠키 인증 허용
+            config.setAllowCredentials(true);
             config.setMaxAge(3600L);
             return config;
         };
     }
 
+    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

@@ -21,7 +21,7 @@ import com.mycom.myapp.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@RestController	
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {

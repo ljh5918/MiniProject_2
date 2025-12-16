@@ -10,6 +10,10 @@ let currentMovieData = null;
 let isLiked = false;
 let currentUserEmail = null;
 
+//let popularCurrentPage = 1; // 추가 
+let currentPage = 1;
+let totalPages = 500; // TMDB popular는 최대 500페이지
+
 /* =========================================
    2. 초기화
    ========================================= */
@@ -17,6 +21,7 @@ window.onload = function() {
     checkLoginStatus();
     updateMovieCount();
     fetchAndRenderMovies('/movies/popular', 'popularContainer', 'GRID');
+    loadPopularMovies(1); // 추가
 };
 
 function updateMovieCount() {
@@ -167,19 +172,26 @@ function fetchAndRenderMovies(url, containerId, type = 'GRID') {
         .catch(err => console.error(err));
 }
 
+
+
 function renderMovies(movies, containerId, type) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     
     if (!movies || movies.length === 0) return;
 
-    // ROW(가로 스크롤)면 20개, GRID면 전체
-    const list = (type === 'ROW') ? movies.slice(0, 20) : movies;
+    // ⭐ GRID → 14개 / ROW → 20개
+    let list;
+    if (type === 'GRID') {
+        list = movies.slice(0, 14);
+    } else {
+        list = movies.slice(0, 20);
+    }
 
     list.forEach(movie => {
         const posterSrc = getPosterUrl(movie.poster_path || movie.posterPath);
         const card = document.createElement('div');
-        card.className = 'movie-card'; 
+        card.className = 'movie-card';
         card.onclick = () => openModal(movie.id);
         card.innerHTML = `
             <img src="${posterSrc}">
@@ -188,6 +200,7 @@ function renderMovies(movies, containerId, type) {
         container.appendChild(card);
     });
 }
+
 
 function getPosterUrl(path) {
     if (!path || path === "null" || path.trim() === "") return NO_POSTER_URL;
@@ -420,5 +433,53 @@ async function deleteComment(id) {
     await fetch(`/comments/${id}`, {method:"DELETE", credentials:"include"});
     loadComments(currentMovieId);
 }
+
+
+
+
+
+
+// 추가 
+
+
+
+function loadPopularMovies(page = 1) {
+    currentPage = page;
+
+    fetch(`/movies/popular?page=${page}`)
+        .then(res => res.json())
+        .then(data => {
+            renderMovies(data, 'popularContainer', 'GRID');
+            updatePaginationUI();
+        })
+        .catch(err => console.error(err));
+}
+
+
+
+function changePage(delta) {
+    const newPage = currentPage + delta;
+
+    if (newPage > 0 && newPage <= totalPages) {
+        loadPopularMovies(newPage);
+   //     window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+
+function updatePaginationUI() {
+    const pageInfo = document.getElementById("pageInfo");
+    const prevBtn = document.getElementById("prevBtn");
+
+    pageInfo.innerText = `Page ${currentPage}`;
+    prevBtn.disabled = currentPage === 1;
+}
+
+
+
+
+
+
+
 document.getElementById('searchInput').addEventListener("keypress", e=>{if(e.key==="Enter") searchMovies()});
 document.getElementById('commentInput').addEventListener("keypress", e=>{if(e.key==="Enter" && !e.shiftKey) {e.preventDefault(); postComment();}});
