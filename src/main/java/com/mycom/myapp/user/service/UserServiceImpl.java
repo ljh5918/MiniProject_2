@@ -23,9 +23,21 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder; 
     private final JwtTokenProvider jwtTokenProvider; 
 
+    
     @Override
+    @Transactional
     public UserResultDto register(UserDto userDto) {
-        // ... 기존 회원가입 로직 유지 ...
+
+        // 1️⃣ 이메일 중복 체크
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("사용중인 email 입니다.");
+        }
+
+        // 2️⃣ 닉네임 중복 체크
+        if (userRepository.existsByNickname(userDto.getNickname())) {
+            throw new IllegalArgumentException("사용중인 nickname 입니다.");
+        }
+
         String encodedPw = passwordEncoder.encode(userDto.getPassword());
 
         User user = User.builder()
@@ -43,6 +55,8 @@ public class UserServiceImpl implements UserService {
                 saved.getNickname()
         );
     }
+
+    
     
     // ⭐ [추가] 로그인 로직 구현
     @Override

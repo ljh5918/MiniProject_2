@@ -4,7 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "users")
+//@Table(name = "users")
+@Table(
+	    name = "users",
+	    uniqueConstraints = {
+	        @UniqueConstraint(columnNames = "email"),
+	        @UniqueConstraint(columnNames = "nickname") // ⭐ 추가
+	    }
+	)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
