@@ -16,89 +16,55 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #555; }
 
 /* =========================================
-   2. 헤더 (Header) - ✨ 3단 분리 정렬 적용됨
+   2. 헤더 (Header)
    ========================================= */
 header {
     display: flex; 
-    justify-content: space-between; /* 좌, 중, 우 배분을 위해 필수 */
+    justify-content: space-between; 
     align-items: center;
-    padding: 0 40px; /* 높이가 고정이므로 상하 패딩은 0 */
+    padding: 0 40px; 
     background-color: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(5px);
     position: sticky; top: 0; z-index: 100; 
     border-bottom: 1px solid #333;
-    height: 70px; /* 헤더 높이 고정 */
+    height: 70px; 
     box-sizing: border-box;
 }
 
-/* [좌측] 로고 */
 .header-left { flex: 0 0 auto; }
 .logo { font-size: 26px; font-weight: 900; color: #e50914; cursor: pointer; letter-spacing: -1px; }
 
-/* [중앙] 검색창 + 토글 + 뱃지 */
 .header-center { 
-    flex: 1; /* 남은 공간 모두 차지하여 중앙 정렬 유도 */
-    display: flex; 
-    justify-content: center; /* 내부 요소 중앙 정렬 */
-    align-items: center; 
-    gap: 20px; 
+    flex: 1; 
+    display: flex; justify-content: center; align-items: center; gap: 20px; 
 }
-
-/* 검색창 스타일 */
 .search-box { 
-    display: flex; 
-    align-items: center; 
-    background: #333; 
-    border-radius: 4px; 
-    padding: 0 10px; 
-    border: 1px solid #444;
+    display: flex; align-items: center; 
+    background: #333; border-radius: 4px; padding: 0 10px; border: 1px solid #444;
 }
 .search-box input { 
-    padding: 8px 5px; 
-    width: 280px; 
-    background: transparent; 
-    border: none; 
-    color: white; 
-    outline: none; 
-    font-size: 14px;
+    padding: 8px 5px; width: 280px; background: transparent; 
+    border: none; color: white; outline: none; font-size: 14px;
 }
 .search-box button { 
-    background: none; 
-    border: none; 
-    font-size: 16px; 
-    color: #aaa; 
-    cursor: pointer; 
-    padding: 5px;
+    background: none; border: none; font-size: 16px; color: #aaa; cursor: pointer; padding: 5px;
 }
 .search-box button:hover { color: #fff; }
 
-/* 토글 & 뱃지 */
 .toggle-container { display: flex; align-items: center; gap: 8px; }
 #toggleLabel { font-size: 13px; font-weight: bold; color: #ccc; }
-
 #dbCountBadge {
-    background: #333; 
-    color: #fff;
-    padding: 6px 12px; 
-    border-radius: 20px; 
-    font-size: 12px; 
-    font-weight: 600;
-    cursor: pointer; 
-    border: 1px solid #555;
-    transition: all 0.2s;
+    background: #333; color: #fff; padding: 6px 12px; 
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid #555; transition: all 0.2s;
 }
 #dbCountBadge:hover { background: #444; border-color: #777; }
 
-/* [우측] 인증 버튼 */
 .header-right { flex: 0 0 auto; }
 .auth-buttons { display: flex; align-items: center; gap: 10px; }
 .auth-buttons button { 
-    padding: 7px 15px; 
-    border-radius: 4px; 
-    border: none; 
-    font-weight: 600; 
-    font-size: 13px;
-    cursor: pointer; 
+    padding: 7px 15px; border-radius: 4px; border: none; 
+    font-weight: 600; font-size: 13px; cursor: pointer; 
 }
 .btn-login { background: #e50914; color: white; }
 .btn-signup { background: transparent; color: white; border: 1px solid #666; }
@@ -108,92 +74,64 @@ header {
 #welcomeMsg { font-size: 13px; color: #ccc; margin-right: 10px; }
 #userName { color: #fff; font-weight: bold; }
 
-
 /* =========================================
-   3. 메인 콘텐츠 (Main) - 기존 유지
+   3. 메인 콘텐츠 및 카드
    ========================================= */
 main { padding: 30px 50px; min-height: 100vh; max-width: 1600px; margin: 0 auto; }
 .divider { border: 0; height: 1px; background: #333; margin: 40px 0; }
 
 section h2 { 
-    font-size: 20px; 
-    margin-bottom: 15px; 
-    color: #fff; 
-    font-weight: 700; 
+    font-size: 20px; margin-bottom: 15px; color: #fff; font-weight: 700; 
 }
 
-/* 가로 스크롤 (ROW) */
-.movie-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 15px;
-    overflow-x: auto;
-    padding-bottom: 15px;
-    scroll-behavior: smooth;
-    margin: 0 -20px 40px -20px; /* 좌우 여백 보정 */
-    padding-left: 20px;
-}
-.movie-row .movie-card {
-    flex: 0 0 180px; 
-    width: 180px;
-}
-
-/* 그리드 (GRID) */
+/* 그리드 (GRID) - 찜 목록/메인 공용 */
 .movie-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-    gap: 20px; 
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; 
 }
 
-/* 공통 카드 스타일 */
+/* 카드 스타일 */
 .movie-card { 
-    background: #222; 
-    border-radius: 6px; 
-    overflow: hidden; 
-    cursor: pointer; 
-    transition: transform 0.2s, box-shadow 0.2s; 
+    background: #222; border-radius: 6px; overflow: hidden; 
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; 
 }
 .movie-card:hover { 
-    transform: scale(1.05); 
-    z-index: 10; 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    transform: scale(1.05); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 .movie-card img { 
-    width: 100%; 
-    aspect-ratio: 2 / 3; 
-    object-fit: cover; 
-    background: #111; 
-    display: block; 
+    width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: #111; display: block; 
 }
 .movie-card h3 { 
-    font-size: 14px; 
-    margin: 10px 12px; 
-    color: #ddd; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
+    font-size: 14px; margin: 10px 12px; color: #ddd; 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
 }
 
-/* 토글 스위치 (Switch) */
+/* 버튼 (btn-primary) */
+.btn-primary {
+    padding: 12px 20px; background: #e50914; color: white;
+    border: none; border-radius: 4px; cursor: pointer;
+    font-weight: bold; font-size: 14px; transition: background 0.2s;
+    white-space: nowrap;
+}
+.btn-primary:hover { background: #ff1c28; }
+
+/* 토글 스위치 */
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider {
-  position: absolute; cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
   background-color: #555; transition: .4s; border-radius: 34px;
 }
 .slider:before {
-  position: absolute; content: "";
-  height: 14px; width: 14px;
-  left: 4px; bottom: 4px;
+  position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px;
   background-color: white; transition: .4s; border-radius: 50%;
 }
 input:checked + .slider { background-color: #e50914; }
 input:checked + .slider:before { transform: translateX(18px); }
 
 /* =========================================
-   4. 모달 (1200px 대형 레이아웃) - 기존 유지
+   4. 모달 공통 (Dimmer & Close)
    ========================================= */
+/* 모달 배경 (Dimmer) */
 .modal {
     display: none;
     position: fixed; z-index: 2000;
@@ -204,293 +142,11 @@ input:checked + .slider:before { transform: translateX(18px); }
     justify-content: center; align-items: center;
 }
 
-.modal-content {
-    width: 1200px; height: 700px; 
-    background-color: #181818;
-    border-radius: 12px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.9);
-    position: relative; overflow: hidden;
-    border: 1px solid #333;
-    animation: modalFadeIn 0.3s ease-out;
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
+/* 닫기 버튼 */
 .close {
     position: absolute; right: 20px; top: 15px;
     font-size: 30px; color: #fff; cursor: pointer; z-index: 100;
     line-height: 1; transition: color 0.2s;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
 }
 .close:hover { color: #e50914; }
-
-/* 3열 레이아웃: 포스터(400px) | 정보(유동) | 댓글(320px) */
-.modal-layout-3col {
-    display: grid;
-    grid-template-columns: 400px 1fr 320px; 
-    width: 100%; height: 100%;
-}
-
-/* Col 1: Poster */
-.modal-left { background: #000; overflow: hidden; }
-.modal-left img { 
-    width: 100%; height: 100%; 
-    object-fit: cover; opacity: 0.9; 
-    mask-image: linear-gradient(to right, black 90%, transparent 100%);
-}
-
-/* Col 2: Info */
-.modal-detail-pane {
-    padding: 30px;
-    display: flex; flex-direction: column;
-    border-right: 1px solid #2a2a2a;
-    overflow: hidden;
-    position: relative;
-}
-
-.modal-header-info { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-.title-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-.modal-header-info h2 { font-size: 32px; margin: 0; color: #fff; line-height: 1.1; font-weight: 800; }
-
-.btn-like {
-    padding: 6px 14px; background: transparent; color: #ccc;
-    border: 1px solid #555; border-radius: 20px; 
-    font-size: 13px; cursor: pointer; transition: 0.2s; white-space: nowrap;
-}
-.btn-like:hover { border-color: #fff; color: #fff; }
-.btn-like.favorited { background: #e50914; border-color: #e50914; color: #fff; }
-
-.modal-overview-box { 
-    flex: 1; overflow-y: auto; 
-    padding-right: 10px; margin-bottom: 20px; 
-}
-.modal-overview-box h3 { 
-    font-size: 16px; color: #fff; margin-bottom: 10px; font-weight: bold; 
-    border-left: 3px solid #e50914; padding-left: 10px;
-}
-.modal-overview-box p { font-size: 15px; line-height: 1.6; color: #bbb; margin: 0; }
-
-/* 추천 영역 */
-.modal-recommend-box { 
-    height: 250px; flex-shrink: 0; 
-    border-top: 1px solid #333; padding-top: 15px; 
-    display: flex; flex-direction: column; 
-}
-.modal-recommend-box h3 { font-size: 14px; color: #888; margin-bottom: 10px; }
-
-.recommend-grid { 
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
-}
-
-.recommend-grid p {
-    grid-column: 1 / -1; /* 1번 기둥부터 끝까지 다 씀 */
-    text-align: center;  /* 가운데 정렬 */
-    width: 100%;
-    padding: 20px 0;
-    color: #777;
-    font-size: 14px;
-}
-.recommend-card img { 
-    width: 100%; aspect-ratio: 2/3; object-fit: cover; 
-    border-radius: 4px; background: #333; 
-    transition: 0.2s; cursor: pointer;
-}
-.recommend-card:hover img { transform: scale(1.05); }
-.recommend-card p { display: none; } 
-
-/* =========================================
-   [3열] 댓글 패널 (우측 사이드바)
-   ========================================= */
-
-/* 1. 댓글 패널 전체 컨테이너 */
-.modal-comment-pane {
-    background-color: #202020;
-    display: flex; flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-    min-height: 0;
-}
-
-/* 2. 댓글 헤더 ("댓글" 제목) */
-.comment-header {
-    flex: 0 0 auto;
-    padding: 20px;
-    border-bottom: 1px solid #333;
-    background: #202020;
-}
-.comment-header h3 { margin: 0; font-size: 16px; color: #ddd; }
-
-/* 3. 댓글 목록 스크롤 영역 */
-.comment-scroll-area {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto; /* 내용 넘치면 스크롤 */
-    padding: 15px;
-    background: #202020;
-}
-
-/* 4. 개별 댓글 아이템 (어두운 박스 디자인) */
-.comment-item {
-    background: #2b2b2b; 
-    padding: 12px; 
-    border-radius: 8px; 
-    margin-bottom: 10px;
-}
-
-.comment-item .meta {
-    font-size: 11px; 
-    color: #888; 
-    margin-bottom: 6px; 
-    display: flex; 
-    justify-content: space-between;
-}
-
-.comment-item .content {
-    font-size: 13px; 
-    color: #eee; 
-    line-height: 1.4; 
-    white-space: pre-wrap; /* 줄바꿈 유지 */
-    word-break: break-all;
-    max-height: 120px; 
-    overflow-y: auto; /* 너무 길면 내부 스크롤 */
-}
-
-/* 댓글 내부 스크롤바 스타일 */
-.comment-item .content::-webkit-scrollbar { width: 4px; }
-.comment-item .content::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
-
-/* 삭제 버튼 (x 표시) */
-.btn-delete { 
-    color: #ff4d4d; 
-    border: none; 
-    background: none; 
-    cursor: pointer; 
-    font-size: 11px; 
-}
-
-/* 5. 댓글 입력 영역 (하단 고정) */
-.comment-input-area {
-    flex: 0 0 auto;
-    padding: 15px;
-    background: #1a1a1a;
-    border-top: 1px solid #333;
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px;
-}
-
-#commentInput {
-    width: 100%; 
-    height: 50px; 
-    background: #333; 
-    border: 1px solid #444; 
-    color: #fff; 
-    padding: 10px; 
-    border-radius: 6px; 
-    resize: none;
-    box-sizing: border-box; 
-    font-family: inherit;
-}
-#commentInput:focus { outline: none; border-color: #e50914; }
-
-#commentSubmitBtn {
-    align-self: flex-end;
-    padding: 6px 15px; 
-    background: #e50914; 
-    color: #fff;
-    border: none; 
-    border-radius: 4px; 
-    font-weight: bold; 
-    cursor: pointer;
-    font-size: 13px;
-}
-
-
-
-
-
-/* =========================
-   프로필 관리 카드
-========================= */
-.profile-box {
-    background: linear-gradient(145deg, #1a1a1a, #111);
-    border-radius: 14px;
-    padding: 24px 28px;
-    width: 420px;
-    margin-bottom: 40px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-}
-
-.profile-box h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    color: #fff;
-}
-
-/* 행 기본 */
-.profile-row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 16px;
-    gap: 6px;
-}
-
-.profile-row label {
-    font-size: 13px;
-    color: #bbb;
-}
-
-/* input 스타일 */
-.profile-row input {
-    background: #222;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: #fff;
-    font-size: 14px;
-}
-
-.profile-row input:focus {
-    outline: none;
-    border-color: #ff2f2f;
-    box-shadow: 0 0 0 1px rgba(255,47,47,0.4);
-}
-
-/* readonly */
-.profile-row input[readonly] {
-    background: #181818;
-    color: #888;
-    cursor: not-allowed;
-}
-
-/* 버튼 + input 나란히 */
-.profile-row.inline {
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-.profile-row.inline > div {
-    flex: 1;
-}
-
-/* 버튼 */
-.btn-primary {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 8px;
-    border: none;
-    background: #ff2f2f;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-    background: #ff4a4a;
-    transform: translateY(-1px);
-}
-

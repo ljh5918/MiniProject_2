@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>마이페이지 - MovieSense</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mypage.css">
 </head>
 <body>
 
@@ -15,6 +16,7 @@
         </div>
         <div id="userNav" style="display:none;">
             <span id="welcomeMsg"></span>
+            <button onclick="openProfileModal()" class="btn-mypage">프로필 수정</button>
             <button onclick="logout()">로그아웃</button>
         </div>
     </div>
@@ -22,46 +24,60 @@
 
 <main>
 
-<section class="profile-box">
-    <h2>👤 프로필 관리</h2>
-
-    <div class="profile-row">
-        <label>이메일</label>
-        <input type="text" id="emailInput" readonly>
-    </div>
-
-    <div class="profile-row inline">
-        <div>
-            <label>닉네임</label>
-            <input type="text" id="nicknameInput">
-        </div>
-        <button class="btn-primary" onclick="updateNickname()">수정</button>
-    </div>
-
-	<div class="profile-row inline narrow">
-	    <div>
-	        <label>현재 비밀번호</label>
-	        <input type="password" id="currentPw">
-	    </div>
-	</div>
-
-
-    <div class="profile-row inline">
-        <div>
-            <label>새 비밀번호</label>
-            <input type="password" id="newPw">
-        </div>
-        <button class="btn-primary" onclick="updatePassword()">변경</button>
-    </div>
-</section>
-
-
-<h2>⭐ 내가 찜한 영화</h2>
-<div id="favoritesContainer" class="movie-grid"></div>
+    <h2>⭐ 내가 찜한 영화</h2>
+    <div id="favoritesContainer" class="movie-grid"></div>
 
 </main>
 
-<!-- ✅ 마이페이지 전용 JS -->
+<div id="profileModal" class="modal">
+    <div class="modal-content profile-modal">
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+        
+        <h2>👤 프로필 관리 및 수정</h2>
+
+        <div class="profile-row">
+            <label>이메일</label>
+            <input type="text" id="modalEmailInput" readonly>
+        </div>
+
+        <div class="profile-section">
+            <h3>닉네임 수정</h3>
+            <div class="profile-row inline">
+                <div>
+                    <label>새 닉네임</label>
+                    <input type="text" id="modalNicknameInput" value="">
+                </div>
+                <button class="btn-primary" onclick="updateNicknameFromModal()">수정</button>
+            </div>
+        </div>
+        
+        <hr class="modal-divider">
+
+        <div class="profile-section">
+            <h3>비밀번호 변경</h3>
+            
+            <div class="profile-row inline">
+                <div>
+                    <label>현재 비밀번호</label>
+                    <input type="password" id="modalCurrentPw">
+                </div>
+                <button class="btn-primary" style="visibility: hidden; pointer-events: none;">
+                    변경
+                </button>
+            </div>
+
+            <div class="profile-row inline">
+                <div>
+                    <label>새 비밀번호</label>
+                    <input type="password" id="modalNewPw">
+                </div>
+                <button class="btn-primary" onclick="updatePasswordFromModal()">
+                    변경
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/js/mypage.js"></script>
 </body>
 </html>

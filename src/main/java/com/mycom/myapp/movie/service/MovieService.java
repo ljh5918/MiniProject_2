@@ -7,6 +7,7 @@ import com.mycom.myapp.movie.repository.PopularMovieHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Console;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,8 @@ public class MovieService {
                     .build();
             movieRepository.save(movie);
         }
+        String videoKey = tmdbApiClient.getMovieTrailerKey(tmdbId);
+        movieDto.setVideoKey(videoKey);
 
         return movieDto;
     }
@@ -98,6 +102,7 @@ public class MovieService {
     }
     
     // 인기영화 api
+    @Cacheable("popularMovies") //spring cash 사용으로 360~500ms -> 5ms 까지 축소가능
     public List<TmdbMovieDto> getPopularMovies() {
         return tmdbApiClient.getPopularMovies(); 
     }
@@ -106,6 +111,7 @@ public class MovieService {
     public List<TmdbMovieDto> getRecommendations(Long tmdbId) {
         return tmdbApiClient.getRecommendations(tmdbId);
     }
+    
     public Long getMovieCount() {
         return movieRepository.count(); 
     }

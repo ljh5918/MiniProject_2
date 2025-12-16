@@ -45,7 +45,7 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/img/**",
                     "/test/**"
                 ).permitAll()
-
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // 2. 인증 관련 API (로그인/회원가입은 누구나 접근 가능)
                 .requestMatchers(
                     "/user/login", 

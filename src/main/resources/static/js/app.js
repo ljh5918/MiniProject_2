@@ -218,7 +218,7 @@ function searchMovies() {
 }
 
 /* =========================================
-   5. 모달 (1200px 대형 UI 대응)
+   5. 모달
    ========================================= */
 function openModal(movieId) {
     currentMovieId = movieId; 
@@ -243,35 +243,54 @@ function openModal(movieId) {
             document.getElementById('modalTitle').innerText = movie.title;
             document.getElementById('modalOverview').innerText = movie.overview || "줄거리가 제공되지 않았습니다.";
 			
-			// 1. 요소 가져오기 (변수 선언 필수!)
+			// ⭐ [핵심] 비디오 처리 로직
+			    const posterImg = document.getElementById('modalPoster');
+			    const videoFrame = document.getElementById('modalVideo');
+
+			    if (movie.videoKey) {
+			        
+			        //posterImg.style.display = 'none';
+			        //videoFrame.style.display = 'block';
+			        
+			        // 자동재생(autoplay=1) & 음소거(mute=1, 브라우저 정책상 필수)
+			        videoFrame.src = `https://www.youtube.com/embed/${movie.videoKey}?autoplay=1&mute=1&controls=1&modestbranding=1`;
+			    
+			    } else {
+			        // 2. 예고편이 없으면 -> 비디오 숨기고 포스터 보여줌
+			        videoFrame.style.display = 'none';
+			        posterImg.style.display = 'block';
+			        videoFrame.src = ""; // 영상 끄기
+			        
+			        if (movie.poster_path) {
+			            posterImg.src = "https://image.tmdb.org/t/p/w500" + movie.poster_path;
+			        }
+			    }
+
+			    modal.style.display = 'flex';
+			
 			const overviewEl = document.getElementById('modalOverview');
 
-			// 2. 줄거리 데이터 확인 및 분기 처리
 			if (movie.overview && movie.overview.trim() !== "") {
-			    // [CASE 1] 줄거리가 있을 때
+			    // 줄거리가 있을 때
 			    overviewEl.innerText = movie.overview;
-			    
-			    // 스타일: 일반 텍스트 모드
 			    overviewEl.style.display = 'block';
 			    overviewEl.style.textAlign = 'left';
 			    overviewEl.style.color = '#bbb';
-			    overviewEl.style.height = 'auto'; // 높이 자동 조절
-			    overviewEl.style.justifyContent = ''; // flex 속성 초기화
+			    overviewEl.style.height = 'auto';
+			    overviewEl.style.justifyContent = ''; 
 			    overviewEl.style.alignItems = '';
 			} else {
-			    // [CASE 2] 줄거리가 없을 때
+			    //  줄거리가 없을 때
 			    overviewEl.innerText = "줄거리가 제공되지 않았습니다.";
 			    
-			    // 스타일: 박스 정중앙 배치 모드 (Flexbox)
 			    overviewEl.style.display = 'flex';
-			    overviewEl.style.justifyContent = 'center'; // 가로 중앙
-			    overviewEl.style.alignItems = 'center';     // 세로 중앙
-			    overviewEl.style.height = '70%';           // 부모 높이만큼 꽉 채움
-			    overviewEl.style.minHeight = '70px';       // 최소 높이 확보 (너무 납작해지지 않게)
-			    overviewEl.style.color = '#777';            // 흐린 글씨
+			    overviewEl.style.justifyContent = 'center';
+			    overviewEl.style.alignItems = 'center';    
+			    overviewEl.style.height = '70%';           
+			    overviewEl.style.minHeight = '70px';      
+			    overviewEl.style.color = '#777';      
 			    overviewEl.style.textAlign = 'center';
 			}
-			
             document.getElementById('modalPoster').src = getPosterUrl(movie.posterPath || movie.poster_path);
             
             if (isUserLoggedIn) checkIfFavorite(movieId);
@@ -288,6 +307,14 @@ function openModal(movieId) {
 function closeModal() {
     document.getElementById('movieModal').style.display = 'none';
     document.body.style.overflow = 'auto';
+	const modal = document.getElementById('movieModal');
+	    modal.style.display = 'none';
+	    const videoFrame = document.getElementById('modalVideo');
+	    videoFrame.src = "";
+	    
+	    // 다시 포스터 모드로 복귀
+	    document.getElementById('modalPoster').style.display = 'block';
+	    videoFrame.style.display = 'none';
 }
 window.onclick = function(e) { if (e.target == document.getElementById('movieModal')) closeModal(); }
 
@@ -374,7 +401,7 @@ function renderComments(comments) {
             <div class="content">${cm.content}</div>
             ${isOwner ? `<div style="text-align:right;"><button onclick="deleteComment(${cm.commentId||cm.id})" class="btn-delete">삭제</button></div>` : ''}
         `;
-        c.appendChild(item);
+        c.prepend(item);
     });
     c.scrollTop = c.scrollHeight;
 }

@@ -1,15 +1,17 @@
 package com.mycom.myapp.movie.service;
 
-import com.mycom.myapp.movie.dto.TmdbMovieDto;
-import com.mycom.myapp.movie.dto.TmdbResponseDto;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.mycom.myapp.movie.dto.TmdbMovieDto;
+import com.mycom.myapp.movie.dto.TmdbResponseDto;
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -81,5 +83,43 @@ public class TmdbApiClient {
                 return false; 
             })
             .collect(Collectors.toList());
+    }
+    
+ // ... 기존 코드 ...
+
+    // ⭐ [추가] 영화 ID로 예고편 Key 가져오기
+    public String getMovieTrailerKey(Long movieId) {
+        String url = BASE_URL + "/movie/" + movieId + "/videos?api_key=" + apiKey + "&language=ko-KR";
+        
+        try {
+            // 1. 결과 받아오기
+            VideoResponse response = restTemplate.getForObject(url, VideoResponse.class);
+            
+            if (response != null && response.getResults() != null) {
+                // 2. YouTube이면서 Trailer인 것 찾기 (없으면 Teaser라도)
+                return response.getResults().stream()
+                        .filter(v -> "YouTube".equals(v.getSite()))
+                        .filter(v -> "Trailer".equals(v.getType()))
+                        .findFirst() // 첫 번째 것 발견하면 리턴
+                        .map(VideoResult::getKey)
+                        .orElse(null); // 없으면 null
+            }
+        } catch (Exception e) {
+            System.out.println("예고편 없음: " + movieId);
+        }
+        return null;
+    }
+
+    // 내부 클래스 (JSON 파싱용) - TmdbApiClient 클래스 맨 아래에 넣으세요
+    @Data
+    static class VideoResponse {
+        private List<VideoResult> results;
+    }
+
+    @Data
+    static class VideoResult {
+        private String key;
+        private String site;
+        private String type;
     }
 }
