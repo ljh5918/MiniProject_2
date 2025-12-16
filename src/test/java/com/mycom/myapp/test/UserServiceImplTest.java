@@ -31,6 +31,7 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+<<<<<<< Updated upstream
     @Mock
     private PasswordEncoder passwordEncoder;
 
@@ -77,6 +78,75 @@ class UserServiceImplTest {
         assertEquals("test@test.com", result.getEmail());
         assertEquals("tester", result.getNickname());
     }
+=======
+    
+        /* ---------------------------------
+         * 이메일 중복 시 회원가입 실패
+         --------------------------------- */
+        @Test
+        @DisplayName("실 DB 기준: 이미 존재하는 이메일이면 회원가입 실패")
+        void register_fail_when_email_duplicate() {
+
+            // ⚠️ 반드시 DB에 이미 존재하는 이메일
+            String email = "asd@asd.com"; 
+            String nickname = "uniqueNickname123"; // 닉네임은 중복되지 않게
+
+            UserDto userDto = UserDto.builder()
+                    .email(email)
+                    .password("anyPassword")
+                    .nickname(nickname)
+                    .build();
+
+            assertThatThrownBy(() -> userService.register(userDto))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("사용중인 email 입니다.");
+        }
+
+        /* ---------------------------------
+         * 닉네임 중복 시 회원가입 실패
+         --------------------------------- */
+        @Test
+        @DisplayName("실 DB 기준: 이미 존재하는 닉네임이면 회원가입 실패")
+        void register_fail_when_nickname_duplicate() {
+
+            // ⚠️ 반드시 DB에 이미 존재하는 닉네임
+            String nickname = userRepository.findAll().get(0).getNickname(); 
+            String email = "uniqueEmail123@test.com"; // 이메일은 중복되지 않게
+
+            UserDto userDto = UserDto.builder()
+                    .email(email)
+                    .password("anyPassword")
+                    .nickname(nickname)
+                    .build();
+
+            assertThatThrownBy(() -> userService.register(userDto))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("사용중인 nickname 입니다.");
+        }
+
+        /* ---------------------------------
+         * 이메일 & 닉네임 모두 중복 시 회원가입 실패
+         --------------------------------- */
+        @Test
+        @DisplayName("실 DB 기준: 이메일과 닉네임 모두 이미 존재하면 회원가입 실패")
+        void register_fail_when_email_and_nickname_duplicate() {
+
+            String email = "asd@asd.com"; // DB에 존재
+            String nickname = userRepository.findAll().get(0).getNickname(); // DB에 존재
+
+            UserDto userDto = UserDto.builder()
+                    .email(email)
+                    .password("anyPassword")
+                    .nickname(nickname)
+                    .build();
+
+            assertThatThrownBy(() -> userService.register(userDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+            // 메시지는 이메일 중복이 먼저 체크되므로 "사용중인 email 입니다." 나올 것
+        }
+    
+
+>>>>>>> Stashed changes
 
 //    @Test
 //    void loginTest() {

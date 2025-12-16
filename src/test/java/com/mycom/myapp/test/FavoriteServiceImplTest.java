@@ -37,8 +37,13 @@ class FavoriteServiceImplTest {
     @Mock
     private MovieRepository movieRepository;
 
+<<<<<<< Updated upstream
     @Mock
     private UserRepository userRepository;
+=======
+    // ⚠️ 반드시 실 DB에 존재하는 사용자 이메일
+    private final String EXIST_EMAIL = "asd@asd.com";
+>>>>>>> Stashed changes
 
     @InjectMocks
     private FavoriteServiceImpl favoriteService;
