@@ -1,0 +1,128 @@
+/* =========================================
+   1. 마이페이지 찜 목록 보완
+   ========================================= */
+/* 찜 삭제 버튼 */
+#favoritesContainer .btn-delete {
+    padding: 5px 10px; background-color: #4a0505; color: #ff8888;
+    border-radius: 4px; border: 1px solid #700; font-size: 11px;
+    margin: 0 12px 10px; display: block; cursor: pointer;
+}
+/* =========================================
+   1. 마이페이지 찜 목록 보완
+   ========================================= */
+
+/* =========================================
+   1. 마이페이지 찜 목록 보완
+   ========================================= */
+
+/* 찜 목록의 영화 카드 (.movie-card)는 style.css에 이미 
+   position: relative; 와 overflow: hidden; 이 적용되어 있습니다. */
+
+/* [기본 상태] 찜 삭제 버튼 - 포스터 우측 상단 오버레이 */
+#favoritesContainer .btn-delete {
+    /* ⭐ 핵심: 절대 위치로 배치를 변경 */
+    position: absolute;
+    top: 5px;   /* 위에서 10px 떨어짐 */
+    right: 5px; /* 오른쪽에서 10px 떨어짐 */
+    z-index: 20; /* 이미지 위에 올라오도록 순서 지정 */
+
+    /* 디자인: 반투명 검정 배경으로 포스터 위에 글씨가 잘 보이게 함 */
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(2px); /* 배경을 살짝 흐리게 (지원 브라우저만) */
+    
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    margin: 0; /* 기존 마진 제거 */
+    transition: all 0.2s ease;
+}
+
+/* [호버 상태] 버튼에 마우스를 올렸을 때만 강조 */
+#favoritesContainer .btn-delete:hover {
+    background-color: #e50914; /* 넷플릭스 레드 */
+    border-color: #e50914;
+    color: #fff;
+    transform: scale(1.05); /* 살짝 커짐 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* ✅ [수정] 버튼에 '직접' 마우스를 올렸을 때만 빨갛게 강조 */
+#favoritesContainer .btn-delete:hover {
+    background-color: #e50914; /* 넷플릭스 레드 */
+    color: #fff;
+    border-color: #e50914;
+    transform: scale(1.1); /* 버튼 살짝 커짐 */
+}
+
+/* =========================================
+   2. 프로필 관리 모달 (500px 소형 레이아웃)
+   ========================================= */
+
+/* 모달 컨테이너 z-index 상향 조정 */
+.modal {
+    z-index: 3000; 
+}
+
+/* ⭐ 여기에서 .modal-content를 500px로 정의합니다 */
+.modal-content {
+    width: 500px !important; /* index.css와 다른 크기 */
+    background-color: #1a1a1a;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    position: relative;
+    border: 1px solid #333; 
+    animation: modalSlideDown 0.3s ease-out;
+}
+
+@keyframes modalSlideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 닫기 버튼 보완 */
+.modal-content .close {
+    font-size: 28px; opacity: 0.7;
+}
+.modal-content .close:hover { opacity: 1; }
+
+/* 프로필 전용 내부 스타일 */
+.modal-content h2 {
+    color: #fff; font-size: 22px; font-weight: 700;
+    margin-top: 0; margin-bottom: 25px;
+    border-bottom: 2px solid #e50914; padding-bottom: 10px;
+}
+
+.profile-section h3 {
+    font-size: 16px; color: #ddd;
+    margin-top: 25px; margin-bottom: 15px; font-weight: 600;
+    padding-left: 8px; border-left: 3px solid #e50914; 
+}
+
+.profile-row {
+    margin-bottom: 15px; display: flex; flex-direction: column;
+}
+.profile-row label {
+    font-size: 13px; color: #999; margin-bottom: 5px; font-weight: 500;
+}
+
+.profile-row input[type="text"], 
+.profile-row input[type="password"] {
+    padding: 12px 10px; border: 1px solid #444; background: #333; color: #fff;
+    border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 15px;
+    transition: border-color 0.2s;
+}
+.profile-row input:focus { outline: none; border-color: #e50914; }
+.profile-row input[readonly] { background: #252525; color: #aaa; cursor: default; }
+
+.profile-row.inline {
+    flex-direction: row; align-items: flex-end; gap: 15px; 
+}
+.profile-row.inline > div { flex: 1; }
+
+.modal-divider {
+    border: 0; height: 1px; background: #333; margin: 20px 0;
+}
