@@ -28,10 +28,17 @@ public class UserController {
 
     private final UserService userService;
     
-	  @PostMapping("/register")
-	  public UserResultDto register(@RequestBody UserDto userDto) {
-	      return userService.register(userDto);
-	  }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserDto userDto) {
+        try {
+            UserResultDto result = userService.register(userDto);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()      // ⭐ 400
+                    .body(e.getMessage());
+        }
+    }
 
 	  @PostMapping("/login")
 	  public ResponseEntity<Map<String, Object>> login(@RequestBody UserLoginDto userLoginDto) {
