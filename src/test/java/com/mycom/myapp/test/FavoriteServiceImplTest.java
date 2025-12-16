@@ -32,7 +32,7 @@ class FavoriteServiceImplTest {
     private MovieRepository movieRepository;
 
     // ⚠️ 반드시 실 DB에 존재하는 사용자 이메일
-    private final String EXIST_EMAIL = "asdㅁㄴ@asd.com";
+    private final String EXIST_EMAIL = "asd@asd.com";
 
     // 테스트용 영화 정보 (DB에 없어도 됨)
     private final Long MOVIE_ID = 999999L;
