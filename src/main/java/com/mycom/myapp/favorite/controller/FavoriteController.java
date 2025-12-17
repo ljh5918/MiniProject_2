@@ -51,21 +51,6 @@ public class FavoriteController {
         return ResponseEntity.ok("success");
     }
     
-
-
-
-//    @GetMapping("/list")
-//    public ResponseEntity<?> getFavorites(HttpServletRequest request) {
-//
-//        String token = extractToken(request);
-//        if (token == null || !jwtTokenProvider.validateToken(token)) {
-//            return ResponseEntity.status(401).body("Unauthorized");
-//        }
-//
-//        String email = jwtTokenProvider.getAuthentication(token).getName();
-//
-//        return ResponseEntity.ok(favoriteService.getFavorites(email));
-//    }
     
     @GetMapping("/list")
     public ResponseEntity<?> getFavorites(HttpServletRequest request) {
