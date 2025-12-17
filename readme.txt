@@ -208,7 +208,8 @@ public Movie getOrSaveMovie(Long tmdbId) {
 ## 12. 팀 정보
 
 * 프로젝트명 : MovieSense
-* 개발 인원 : 2명
+* 팀원 : 이재혁, 정현서
+* 개발 인원 : 2명 
 * 개발 기간 : 7일
 
 ---
