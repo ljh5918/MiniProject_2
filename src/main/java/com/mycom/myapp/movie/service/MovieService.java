@@ -102,6 +102,7 @@ public class MovieService {
     }
     
     // 인기영화 api
+    @Cacheable(value = "popularMovies")
     public List<TmdbMovieDto> getPopularMovies(int page) {
         return tmdbApiClient.getPopularMovies(page);
     }
