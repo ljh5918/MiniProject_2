@@ -437,12 +437,7 @@ async function deleteComment(id) {
 
 
 
-
-
 // 추가 
-
-
-
 function loadPopularMovies(page = 1) {
     currentPage = page;
 

@@ -1,5 +1,3 @@
-// PageController.java
-
 package com.mycom.myapp.controller;
 
 import org.springframework.stereotype.Controller;
